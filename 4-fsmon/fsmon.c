@@ -1,0 +1,120 @@
+# include <linux/module.h>
+# include <linux/kernel.h>
+# include <linux/syscalls.h>
+
+
+MODULE_LICENSE("GPL");
+
+asmlinkage unsigned long long **sys_call_table;
+
+asmlinkage long
+fake_open(const char __user *filename, int flags, umode_t mode);
+asmlinkage long
+fake_unlink(const char __user *pathname);
+asmlinkage long
+fake_unlinkat(int dfd, const char __user * pathname, int flag);
+asmlinkage long
+(*real_open)(const char __user *filename, int flags, umode_t mode);
+asmlinkage long
+(*real_unlink)(const char __user *pathname);
+asmlinkage long
+(*real_unlinkat)(int dfd, const char __user * pathname, int flag);
+
+
+unsigned long long **
+get_sys_call_table(void)
+{
+  unsigned long long **entry = (unsigned long long **)PAGE_OFFSET;
+
+  /* Conquer or die. */
+  for (;; entry += 1) {
+    if (entry[__NR_close] == (unsigned long long *)sys_close) {
+        return entry;
+      }
+  }
+
+  /* Won't happen. */
+  return NULL;
+}
+
+
+void
+disable_write_protection(void)
+{
+  unsigned long cr0 = read_cr0();
+  clear_bit(16, &cr0);
+  write_cr0(cr0);
+}
+
+
+void
+enable_write_protection(void)
+{
+  unsigned long cr0 = read_cr0();
+  set_bit(16, &cr0);
+  write_cr0(cr0);
+}
+
+
+int
+init_module(void)
+{
+  printk(KERN_ALERT "%s\n", "Greetings the World!");
+
+  sys_call_table = get_sys_call_table();
+
+  disable_write_protection();
+  real_open = (void *)sys_call_table[__NR_open];
+  sys_call_table[__NR_open] = (unsigned long long*)fake_open;
+  real_unlink = (void *)sys_call_table[__NR_unlink];
+  sys_call_table[__NR_unlink] = (unsigned long long*)fake_unlink;
+  real_unlinkat = (void *)sys_call_table[__NR_unlinkat];
+  sys_call_table[__NR_unlinkat] = (unsigned long long*)fake_unlinkat;
+  enable_write_protection();
+
+  return 0;
+}
+
+
+void
+cleanup_module(void)
+{
+  disable_write_protection();
+  sys_call_table[__NR_open] = (unsigned long long*)real_open;
+  sys_call_table[__NR_unlink] = (unsigned long long*)real_unlink;
+  sys_call_table[__NR_unlinkat] = (unsigned long long*)real_unlinkat;
+  enable_write_protection();
+
+  printk(KERN_ALERT "%s\n", "Farewell the World!");
+
+  return;
+}
+
+
+asmlinkage long
+fake_open(const char __user *filename, int flags, umode_t mode)
+{
+  if (flags & O_CREAT) {
+    printk(KERN_ALERT "open: %s\n", filename);
+  }
+
+  return real_open(filename, flags, mode);
+}
+
+
+asmlinkage long
+fake_unlink(const char __user *pathname)
+{
+  printk(KERN_ALERT "unlink: %s\n", pathname);
+
+  return real_unlink(pathname);
+}
+
+
+asmlinkage long
+fake_unlinkat(int dfd, const char __user * pathname, int flag)
+{
+  printk(KERN_ALERT "unlinkat: %s\n", pathname);
+
+  return real_unlinkat(dfd, pathname, flag);
+}
