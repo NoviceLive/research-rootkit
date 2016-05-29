@@ -5,7 +5,7 @@
 
 MODULE_LICENSE("GPL");
 
-asmlinkage unsigned long long **sys_call_table;
+asmlinkage unsigned long **sys_call_table;
 
 asmlinkage long
 fake_open(const char __user *filename, int flags, umode_t mode);
@@ -21,14 +21,14 @@ asmlinkage long
 (*real_unlinkat)(int dfd, const char __user * pathname, int flag);
 
 
-unsigned long long **
+unsigned long **
 get_sys_call_table(void)
 {
-  unsigned long long **entry = (unsigned long long **)PAGE_OFFSET;
+  unsigned long **entry = (unsigned long **)PAGE_OFFSET;
 
   /* Conquer or die. */
   for (;; entry += 1) {
-    if (entry[__NR_close] == (unsigned long long *)sys_close) {
+    if (entry[__NR_close] == (unsigned long *)sys_close) {
         return entry;
       }
   }
@@ -65,11 +65,11 @@ init_module(void)
 
   disable_write_protection();
   real_open = (void *)sys_call_table[__NR_open];
-  sys_call_table[__NR_open] = (unsigned long long*)fake_open;
+  sys_call_table[__NR_open] = (unsigned long*)fake_open;
   real_unlink = (void *)sys_call_table[__NR_unlink];
-  sys_call_table[__NR_unlink] = (unsigned long long*)fake_unlink;
+  sys_call_table[__NR_unlink] = (unsigned long*)fake_unlink;
   real_unlinkat = (void *)sys_call_table[__NR_unlinkat];
-  sys_call_table[__NR_unlinkat] = (unsigned long long*)fake_unlinkat;
+  sys_call_table[__NR_unlinkat] = (unsigned long*)fake_unlinkat;
   enable_write_protection();
 
   return 0;
@@ -80,9 +80,9 @@ void
 cleanup_module(void)
 {
   disable_write_protection();
-  sys_call_table[__NR_open] = (unsigned long long*)real_open;
-  sys_call_table[__NR_unlink] = (unsigned long long*)real_unlink;
-  sys_call_table[__NR_unlinkat] = (unsigned long long*)real_unlinkat;
+  sys_call_table[__NR_open] = (unsigned long*)real_open;
+  sys_call_table[__NR_unlink] = (unsigned long*)real_unlink;
+  sys_call_table[__NR_unlinkat] = (unsigned long*)real_unlinkat;
   enable_write_protection();
 
   printk(KERN_ALERT "%s\n", "Farewell the World!");
