@@ -26,14 +26,12 @@ get_sys_call_table(void)
 {
   unsigned long **entry = (unsigned long **)PAGE_OFFSET;
 
-  /* Conquer or die. */
-  for (;; entry += 1) {
+  for (;(unsigned long)entry < ULONG_MAX; entry += 1) {
     if (entry[__NR_close] == (unsigned long *)sys_close) {
         return entry;
       }
   }
 
-  /* Won't happen. */
   return NULL;
 }
 
@@ -61,6 +59,7 @@ init_module(void)
 {
   printk(KERN_ALERT "%s\n", "Greetings the World!");
 
+  /* No consideration on failure. */
   sys_call_table = get_sys_call_table();
 
   disable_write_protection();
@@ -94,7 +93,7 @@ cleanup_module(void)
 asmlinkage long
 fake_open(const char __user *filename, int flags, umode_t mode)
 {
-  if (flags & O_CREAT) {
+  if ((flags & O_CREAT) && strcmp(filename, "/dev/null") != 0) {
     printk(KERN_ALERT "open: %s\n", filename);
   }
 
