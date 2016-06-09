@@ -1,3 +1,5 @@
+`English <README.rst>`_ 中文
+
 Linux Rootkit 研究
 ==================
 
