@@ -1,4 +1,9 @@
-obj-m := write_protection.o
+TARGET = write_protection
+obj-m := ${TARGET}ko.o
+${TARGET}ko-objs := ${TARGET}.o lib/lib.o
+
+
+EXTRA_CFLAGS = "-I${PWD}/lib"
 
 
 default:

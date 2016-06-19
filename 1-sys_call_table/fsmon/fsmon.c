@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # include <linux/kernel.h>
 # include <linux/syscalls.h>
 
+# include "lib/lib.h"
+
 
 MODULE_LICENSE("GPL");
 
@@ -37,39 +39,6 @@ asmlinkage long
 (*real_unlink)(const char __user *pathname);
 asmlinkage long
 (*real_unlinkat)(int dfd, const char __user * pathname, int flag);
-
-
-unsigned long **
-get_sys_call_table(void)
-{
-  unsigned long **entry = (unsigned long **)PAGE_OFFSET;
-
-  for (;(unsigned long)entry < ULONG_MAX; entry += 1) {
-    if (entry[__NR_close] == (unsigned long *)sys_close) {
-        return entry;
-      }
-  }
-
-  return NULL;
-}
-
-
-void
-disable_write_protection(void)
-{
-  unsigned long cr0 = read_cr0();
-  clear_bit(X86_CR0_WP_BIT, &cr0);
-  write_cr0(cr0);
-}
-
-
-void
-enable_write_protection(void)
-{
-  unsigned long cr0 = read_cr0();
-  set_bit(X86_CR0_WP_BIT, &cr0);
-  write_cr0(cr0);
-}
 
 
 int

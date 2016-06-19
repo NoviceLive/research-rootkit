@@ -14,3 +14,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+
+# ifndef _GU_ZHENGXIONG_LIB_H
+# define _GU_ZHENGXIONG_LIB_H
+
+
+unsigned long **
+get_sys_call_table(void);
+
+
+void
+disable_write_protection(void);
+void
+enable_write_protection(void);
+
+
+# endif

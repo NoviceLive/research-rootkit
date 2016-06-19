@@ -1,4 +1,9 @@
-obj-m := fsmon.o
+TARGET = fsmon
+obj-m := ${TARGET}ko.o
+${TARGET}ko-objs := ${TARGET}.o lib/lib.o
+
+
+EXTRA_CFLAGS = "-I${PWD}/lib"
 
 
 default:

@@ -18,27 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # include <linux/module.h>
 # include <linux/kernel.h>
-# include <linux/syscalls.h>
+
+# include "lib/lib.h"
 
 
 MODULE_LICENSE("GPL");
 
 asmlinkage unsigned long **sys_call_table;
-
-
-unsigned long **
-get_sys_call_table(void)
-{
-  unsigned long **entry = (unsigned long **)PAGE_OFFSET;
-
-  for (;(unsigned long)entry < ULONG_MAX; entry += 1) {
-    if (entry[__NR_close] == (unsigned long *)sys_close) {
-        return entry;
-      }
-  }
-
-  return NULL;
-}
 
 
 int
