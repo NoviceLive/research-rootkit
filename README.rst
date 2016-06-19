@@ -11,11 +11,36 @@ The directory structure of this repository might change drastically
 without any notifications.
 
 
+Library
+-------
+
+There are some components
+which are intended to be reused over and over again.
+
+But note that they can always be improved or even corrected.
+
+::
+
+   unsigned long **
+   get_sys_call_table(void);
+
+   void
+   disable_write_protection(void);
+   void
+   enable_write_protection(void);
+
+   char *
+   join_strings(const char *const *strings, const char *delim,
+                char *buff, size_t count);
+   void
+   print_memory(void *addr, size_t count, const char *prompt);
+
+
 Available Courses
 -----------------
 
-Course 1: Modifying sys_call_table
-++++++++++++++++++++++++++++++++++
+Course 1: Modifying / Hooking sys_call_table
+++++++++++++++++++++++++++++++++++++++++++++
 
 - Experiment 1: hello
 
@@ -33,3 +58,20 @@ Course 1: Modifying sys_call_table
 - Final Experiment: fsmon
 
   A primitive file monitor based on system call hooking.
+
+
+Projects Of Interests
+---------------------
+
+- `mncoppola/suterusu`_
+
+  An LKM rootkit targeting Linux 2.6/3.x on x86(_64), and ARM.
+
+
+References & Further Readings
+-----------------------------
+
+- `Suterusu Rootkit: Inline Kernel Function Hooking on x86 and ARM <https://poppopret.org/2013/01/07/suterusu-rootkit-inline-kernel-function-hooking-on-x86-and-arm/>`_
+
+
+.. _mncoppola/suterusu: https://github.com/mncoppola/suterusu

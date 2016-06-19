@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # include <linux/syscalls.h>
 
 
+// TODO: Write other implementation.
 /* unsigned long ** */
 /* get_sys_call_table() */
 /* { */
@@ -42,6 +43,7 @@ get_sys_call_table(void)
 }
 
 
+// TODO: Consider race condition on SMP systems.
 void
 disable_write_protection(void)
 {
@@ -51,6 +53,7 @@ disable_write_protection(void)
 }
 
 
+// TODO: Consider race condition on SMP systems.
 void
 enable_write_protection(void)
 {
@@ -60,6 +63,8 @@ enable_write_protection(void)
 }
 
 
+// TODO: Can we provide these functionality to both user mode and
+// kernel land users in a single code base?
 char *
 join_strings(const char *const *strings, const char *delim,
              char *buff, size_t count)
@@ -86,7 +91,8 @@ join_strings(const char *const *strings, const char *delim,
 void
 print_memory(void *addr, size_t count, const char *prompt)
 {
-  char one[3];
+  const size_t ONE_SIZE = 3;
+  char one[ONE_SIZE];
   size_t index;
   char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
 
@@ -95,7 +101,7 @@ print_memory(void *addr, size_t count, const char *prompt)
     return; // TODO: Do something else?
   }
 
-  sprintf(one, "%02x", *((unsigned char *)addr));
+  snprintf(one, ONE_SIZE, "%02x", *((unsigned char *)addr));
   strlcpy(buff, one, PAGE_SIZE);
 
   for (index = 1; index < count; index += 1) {
@@ -105,7 +111,8 @@ print_memory(void *addr, size_t count, const char *prompt)
       strlcat(buff, " ", PAGE_SIZE);
     }
 
-    sprintf(one, "%02x", *((unsigned char *)addr + index));
+    snprintf(one, ONE_SIZE, "%02x",
+             *((unsigned char *)addr + index));
     strlcat(buff, one, PAGE_SIZE);
   }
 
