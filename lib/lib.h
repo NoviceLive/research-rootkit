@@ -41,8 +41,10 @@ enable_write_protection(void);
 
 
 char *
-strjoin(const char *const *strings, const char *delim,
-        char *buff, size_t count);
+join_strings(const char *const *strings, const char *delim,
+             char *buff, size_t count);
+void
+print_memory(void *addr, size_t count, const char *prompt);
 
 
 # endif

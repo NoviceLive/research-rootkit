@@ -17,7 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # include <linux/kernel.h>
+# include <linux/slab.h>
 # include <linux/syscalls.h>
+
+
+/* unsigned long ** */
+/* get_sys_call_table() */
+/* { */
+/* } */
 
 
 unsigned long **
@@ -54,8 +61,8 @@ enable_write_protection(void)
 
 
 char *
-strjoin(const char *const *strings, const char *delim,
-        char *buff, size_t count)
+join_strings(const char *const *strings, const char *delim,
+             char *buff, size_t count)
 {
   int index;
   const char *one;
@@ -73,4 +80,38 @@ strjoin(const char *const *strings, const char *delim,
   }
 
   return buff;
+}
+
+
+void
+print_memory(void *addr, size_t count, const char *prompt)
+{
+  char one[3];
+  size_t index;
+  char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+
+  if (!buff) {
+    pr_alert("%s\n", "kmalloc failed!");
+    return; // TODO: Do something else?
+  }
+
+  sprintf(one, "%02x", *((unsigned char *)addr));
+  strlcpy(buff, one, PAGE_SIZE);
+
+  for (index = 1; index < count; index += 1) {
+    if (index && index % 16 == 0) {
+      strlcat(buff, "\n", PAGE_SIZE);
+    } else {
+      strlcat(buff, " ", PAGE_SIZE);
+    }
+
+    sprintf(one, "%02x", *((unsigned char *)addr + index));
+    strlcat(buff, one, PAGE_SIZE);
+  }
+
+  pr_alert("%s: %s\n", prompt, buff);
+
+  kfree(buff);
+
+  return;
 }
