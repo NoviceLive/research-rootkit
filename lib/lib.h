@@ -40,4 +40,9 @@ void
 enable_write_protection(void);
 
 
+char *
+strjoin(const char *const *strings, const char *delim,
+        char *buff, size_t count);
+
+
 # endif

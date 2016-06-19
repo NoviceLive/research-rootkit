@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
+# include <linux/kernel.h>
 # include <linux/syscalls.h>
 
 
@@ -49,4 +50,27 @@ enable_write_protection(void)
   unsigned long cr0 = read_cr0();
   set_bit(X86_CR0_WP_BIT, &cr0);
   write_cr0(cr0);
+}
+
+
+char *
+strjoin(const char *const *strings, const char *delim,
+        char *buff, size_t count)
+{
+  int index;
+  const char *one;
+
+  strlcpy(buff, strings[0], count);
+
+  index = 1;
+  one = strings[index];
+  while (one) {
+    strlcat(buff, delim, count);
+    strlcat(buff, one, count);
+
+    index += 1;
+    one = strings[index];
+  }
+
+  return buff;
 }
