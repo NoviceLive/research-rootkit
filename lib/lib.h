@@ -20,6 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # define _GU_ZHENGXIONG_LIB_H
 
 
+# define HOOK_SYS_CALL_TABLE(name)                     \
+  do {                                                 \
+    real_##name = (void *)sys_call_table[__NR_##name]; \
+    sys_call_table[__NR_##name] = (void *)fake_##name; \
+  } while (0)
+
+# define UNHOOK_SYS_CALL_TABLE(name)                \
+  sys_call_table[__NR_##name] = (void *)real_##name
+
+
 unsigned long **
 get_sys_call_table(void);
 
