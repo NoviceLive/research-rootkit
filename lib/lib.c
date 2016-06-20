@@ -151,6 +151,7 @@ print_memory(void *addr, size_t count, const char *prompt)
 }
 
 
+// TODO: We can use ``memcpy`` plus our hand-made ``reverse_memory``.
 void *
 reverse_copy_memory(void *dest, void *from, size_t count)
 {
@@ -167,6 +168,7 @@ reverse_copy_memory(void *dest, void *from, size_t count)
 }
 
 
+// TODO: print_dirent64.
 void
 print_dirent(struct linux_dirent *dirp, long total)
 {
@@ -196,6 +198,7 @@ print_dirent(struct linux_dirent *dirp, long total)
 }
 
 
+// TODO: remove_dirent64_entry.
 long
 remove_dirent_entry(char *name,
                     struct linux_dirent *dirp, long total)

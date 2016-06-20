@@ -29,11 +29,24 @@ But note that they can always be improved or even corrected.
    void
    enable_write_protection(void);
 
+   HOOK_SYS_CALL_TABLE(name);
+   UNHOOK_SYS_CALL_TABLE(name);
+
    char *
    join_strings(const char *const *strings, const char *delim,
                 char *buff, size_t count);
+
+
    void
    print_memory(void *addr, size_t count, const char *prompt);
+   void *
+   reverse_copy_memory(void *dest, void *from, size_t count);
+
+   void
+   print_dirent(struct linux_dirent *dirp, long total);
+   long
+   remove_dirent_entry(char *name,
+                       struct linux_dirent *dirp, long total);
 
 
 Available Courses
@@ -80,6 +93,7 @@ Course 1: Modifying / Hooking sys_call_table
   using system call hooking.
 
   Hooked functions: ``getdents``, ``getdents64``.
+
   Hidden files: ``032416_525.mp4``.
 
   - **Notice**
