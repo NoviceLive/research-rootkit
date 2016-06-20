@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # include <linux/module.h>
 # include <linux/kernel.h>
+# include <linux/slab.h> // kmalloc, kfree.
 # include <linux/syscalls.h>
-# include <linux/slab.h> // kmalloc.
 
 # include "lib/lib.h"
 

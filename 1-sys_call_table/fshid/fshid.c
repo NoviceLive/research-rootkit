@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # include <linux/module.h>
 # include <linux/kernel.h>
 # include <linux/dirent.h> // linux_dirent64.
-# include <linux/slab.h> // kmalloc.
 # include <linux/syscalls.h>
 
 # include "lib/lib.h"

@@ -50,8 +50,6 @@ join_strings(const char *const *strings, const char *delim,
 
 void
 print_memory(void *addr, size_t count, const char *prompt);
-void *
-reverse_copy_memory(void *dest, void *from, size_t count);
 
 
 void

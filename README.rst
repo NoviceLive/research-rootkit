@@ -36,11 +36,8 @@ But note that they can always be improved or even corrected.
    join_strings(const char *const *strings, const char *delim,
                 char *buff, size_t count);
 
-
    void
    print_memory(void *addr, size_t count, const char *prompt);
-   void *
-   reverse_copy_memory(void *dest, void *from, size_t count);
 
    void
    print_dirent(struct linux_dirent *dirp, long total);
