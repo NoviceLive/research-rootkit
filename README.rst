@@ -57,13 +57,27 @@ Course 1: Modifying / Hooking sys_call_table
 
 - Roundup Experiment 1: fsmon
 
-  A primitive file monitor based on system call hooking.
+  A **primitive** file monitor based on system call hooking.
 
   Hooked functions: ``open``, ``unlink``, ``unlinkat``.
 
-- Roundup Experiment 2: fshid
+- Roundup Experiment 2: psmon
 
-  A primitive file-hiding demonstration based on system call hooking.
+  A **primitive** process monitor via system call hooking.
+
+  Hooked functions: ``execve``.
+
+  - **Notice**
+
+    I have seen reports that the method used in this experiment
+    would not work normally
+    due to inconsistent ABI of ``stub_execve``,
+    which requires further investigation.
+
+- Roundup Experiment 3: fshid
+
+  A **primitive** file-hiding demonstration
+  using system call hooking.
 
   Hooked functions: ``getdents``, ``getdents64``.
 
