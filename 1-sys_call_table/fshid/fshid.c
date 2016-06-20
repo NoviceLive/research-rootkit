@@ -111,5 +111,7 @@ fake_getdents64(unsigned int fd,
 
   ret = real_getdents64(fd, dirent, count);
 
+  // TODO: Add hooking logic.
+
   return ret;
 }

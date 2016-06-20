@@ -80,6 +80,12 @@ Course 1: Modifying / Hooking sys_call_table
   using system call hooking.
 
   Hooked functions: ``getdents``, ``getdents64``.
+  Hidden files: ``032416_525.mp4``.
+
+  - **Notice**
+
+    There is no hooking logic in ``getdents64``
+    since I have not triggered it yet.
 
 
 Projects Of Interests
