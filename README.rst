@@ -55,9 +55,17 @@ Course 1: Modifying / Hooking sys_call_table
 
   Disable or enable Write Protection via CR0 register.
 
-- Final Experiment: fsmon
+- Roundup Experiment 1: fsmon
 
   A primitive file monitor based on system call hooking.
+
+  Hooked functions: ``open``, ``unlink``, ``unlinkat``.
+
+- Roundup Experiment 2: fshid
+
+  A primitive file-hiding demonstration based on system call hooking.
+
+  Hooked functions: ``getdents``, ``getdents64``.
 
 
 Projects Of Interests
