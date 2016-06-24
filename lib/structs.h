@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # define _GU_ZHENGXIONG_STRUCTS_H
 
 
-// Copied from fs/readdir.h.
+// INFO: Copied from ``fs/readdir.h``.
 struct linux_dirent {
   unsigned long   d_ino;
   unsigned long   d_off;
@@ -30,7 +30,7 @@ struct linux_dirent {
 
 
 # define TEMPLATE "\x48\xa1\x88\x77\x66\x55\x44\x33\x22\x11\xff\xe0"
-# define HOOKED_SIZE (sizeof(TEMPLATE) - 1 /* Terminating NULL. */)
+# define HOOKED_SIZE (sizeof(TEMPLATE) - 1)
 
 
 struct hooked_item {
@@ -41,4 +41,4 @@ struct hooked_item {
 };
 
 
-# endif
+# endif // structs.h

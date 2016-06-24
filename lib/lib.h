@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # include "structs.h"
+# include "printk.h"
 
 
 # define HOOK_SYS_CALL_TABLE(name)                     \
@@ -59,4 +60,4 @@ remove_dirent_entry(char *name,
                     struct linux_dirent *dirp, long total);
 
 
-# endif
+# endif // lib.h

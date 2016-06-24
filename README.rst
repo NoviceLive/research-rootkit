@@ -49,8 +49,8 @@ But note that they can always be improved or even corrected.
 Available Courses
 -----------------
 
-Course 1: Modifying / Hooking sys_call_table
-++++++++++++++++++++++++++++++++++++++++++++
+Course 1: Modifying / Hooking the sys_call_table
+++++++++++++++++++++++++++++++++++++++++++++++++
 
 - Experiment 1: hello
 
@@ -97,6 +97,13 @@ Course 1: Modifying / Hooking sys_call_table
 
     There is no hooking logic in ``getdents64``
     since I have not triggered it yet.
+
+Course 2: Implementing fundamental functionalities of rootkits
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+- Experiment 1: root
+
+  Providing a root backdoor.
 
 
 Projects Of Interests

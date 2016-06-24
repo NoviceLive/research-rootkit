@@ -16,27 +16,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
+# ifndef CPP
 # include <linux/kernel.h>
 # include <linux/slab.h>
 # include <linux/syscalls.h>
+# endif // CPP
 
 # include "lib/structs.h"
 
 
 // TODO: Write other implementation.
-static unsigned long **
-get_sys_call_table_via_entry_SYSCALL_64(void)
-{
-  return NULL;
-}
+/* static unsigned long ** */
+/* get_sys_call_table_via_entry_SYSCALL_64(void) */
+/* { */
+/*   return NULL; */
+/* } */
 
 
 // TODO: Write other implementation.
-static unsigned long **
-get_sys_call_table_via_System_map(void)
-{
-  return NULL;
-}
+/* static unsigned long ** */
+/* get_sys_call_table_via_System_map(void) */
+/* { */
+/*   return NULL; */
+/* } */
 
 
 // WARN: This can be cheated.
@@ -56,11 +58,11 @@ get_sys_call_table_via_sys_close(void)
 
 
 // TODO: Handle 32-bit cases.
-unsigned long **
-get_ia32_sys_call_table(void)
-{
-  return NULL;
-}
+/* unsigned long ** */
+/* get_ia32_sys_call_table(void) */
+/* { */
+/*   return NULL; */
+/* } */
 
 
 unsigned long **
