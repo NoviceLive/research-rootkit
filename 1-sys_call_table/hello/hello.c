@@ -15,9 +15,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+# ifndef CPP
 # include <linux/module.h>
 # include <linux/kernel.h>
+# endif // CPP
 
 
 MODULE_LICENSE("GPL");
@@ -26,7 +27,7 @@ MODULE_LICENSE("GPL");
 int
 init_module(void)
 {
-  printk(KERN_ALERT "%s\n", "Greetings the World!");
+  pr_alert("%s\n", "Greetings the World!");
 
   return 0;
 }
@@ -35,7 +36,7 @@ init_module(void)
 void
 cleanup_module(void)
 {
-  printk(KERN_ALERT "%s\n", "Farewell the World!");
+  pr_alert("%s\n", "Farewell the World!");
 
   return;
 }

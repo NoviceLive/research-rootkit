@@ -22,10 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // INFO: Copied from ``fs/readdir.h``.
 struct linux_dirent {
-  unsigned long   d_ino;
-  unsigned long   d_off;
-  unsigned short  d_reclen;
-  char            d_name[1];
+    unsigned long   d_ino;
+    unsigned long   d_off;
+    unsigned short  d_reclen;
+    char            d_name[1];
 };
 
 
@@ -34,10 +34,10 @@ struct linux_dirent {
 
 
 struct hooked_item {
-  void *real_addr;
-  unsigned char real_opcode[HOOKED_SIZE];
-  unsigned char fake_opcode[HOOKED_SIZE];
-  struct list_head list;
+    void *real_addr;
+    unsigned char real_opcode[HOOKED_SIZE];
+    unsigned char fake_opcode[HOOKED_SIZE];
+    struct list_head list;
 };
 
 

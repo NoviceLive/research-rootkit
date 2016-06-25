@@ -24,14 +24,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # include "printk.h"
 
 
-# define HOOK_SYS_CALL_TABLE(name)                     \
-  do {                                                 \
-    real_##name = (void *)sys_call_table[__NR_##name]; \
-    sys_call_table[__NR_##name] = (void *)fake_##name; \
-  } while (0)
+# define HOOK_SYS_CALL_TABLE(name)                          \
+    do {                                                    \
+        real_##name = (void *)sys_call_table[__NR_##name];  \
+        sys_call_table[__NR_##name] = (void *)fake_##name;  \
+    } while (0)
 
-# define UNHOOK_SYS_CALL_TABLE(name)                \
-  sys_call_table[__NR_##name] = (void *)real_##name
+# define UNHOOK_SYS_CALL_TABLE(name)                    \
+    sys_call_table[__NR_##name] = (void *)real_##name
+
+
+# define set_f_op(op, path, new, old)                       \
+    do {                                                    \
+        struct file *filp;                                  \
+        struct file_operations *f_op;                       \
+                                                            \
+        fm_alert("Opening the path: %s.\n", path);          \
+        filp = filp_open(path, O_RDONLY, 0);                \
+        if (IS_ERR(filp)) {                                 \
+            fm_alert("Failed to open %s with error %ld.\n", \
+                     path, PTR_ERR(filp));                  \
+            old = NULL;                                     \
+        } else {                                            \
+            fm_alert("Succeeded in opening: %s\n", path);   \
+            f_op = (struct file_operations *)filp->f_op;    \
+            old = f_op->op;                                 \
+                                                            \
+            fm_alert("Changing iterate from %p to %p.\n",   \
+                     old, new);                             \
+            disable_write_protection();                     \
+            f_op->op = new;                                 \
+            enable_write_protection();                      \
+        }                                                   \
+    } while(0)
 
 
 unsigned long **
