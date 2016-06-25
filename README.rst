@@ -105,6 +105,20 @@ Course 2: Implementing fundamental functionalities of rootkits
 
   Providing a root backdoor.
 
+- Experiment 2: komon
+
+  Preventing modules from initializing and functioning
+  by substituting their init and exit functions
+  when ``MODULE_STATE_COMING`` is notified to module notifiers.
+
+- Experiment 3: fshid
+
+  Hiding files by hooking ``filldir``.
+
+- Experiment 4: pshid
+
+  Hiding processes by hiding entries under ``/proc``.
+
 
 Projects Of Interests
 ---------------------
