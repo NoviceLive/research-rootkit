@@ -11,41 +11,6 @@ The directory structure of this repository might change drastically
 without any notifications.
 
 
-Library
--------
-
-There are some components
-which are intended to be reused over and over again.
-
-But note that they can always be improved or even corrected.
-
-::
-
-   unsigned long **
-   get_sys_call_table(void);
-
-   void
-   disable_write_protection(void);
-   void
-   enable_write_protection(void);
-
-   HOOK_SYS_CALL_TABLE(name);
-   UNHOOK_SYS_CALL_TABLE(name);
-
-   char *
-   join_strings(const char *const *strings, const char *delim,
-                char *buff, size_t count);
-
-   void
-   print_memory(void *addr, size_t count, const char *prompt);
-
-   void
-   print_dirent(struct linux_dirent *dirp, long total);
-   long
-   remove_dirent_entry(char *name,
-                       struct linux_dirent *dirp, long total);
-
-
 Available Courses
 -----------------
 
@@ -127,6 +92,14 @@ Projects Of Interests
 
   An LKM rootkit targeting Linux 2.6/3.x on x86(_64), and ARM.
 
+- `ivyl/rootkit`_
+
+  Sample Rootkit for Linux
+
+- `cloudsec/brootkit`_
+
+  Lightweight rootkit implemented by bash shell scripts v0.10.
+
 
 References & Further Readings
 -----------------------------
@@ -135,3 +108,5 @@ References & Further Readings
 
 
 .. _mncoppola/suterusu: https://github.com/mncoppola/suterusu
+.. _ivyl/rootkit: https://github.com/ivyl/rootkit
+.. _cloudsec/brootkit: https://github.com/cloudsec/brootkit
