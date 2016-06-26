@@ -52,7 +52,7 @@ init_module(void)
 {
     fm_alert("%s\n", "Greetings the World!");
 
-    entry = proc_create(NAME, 0666, NULL, &proc_fops);
+    entry = proc_create(NAME, S_IRUGO | S_IWUGO, NULL, &proc_fops);
 
     return 0;
 }
@@ -97,5 +97,6 @@ write_handler(struct file * filp, const char __user *buff,
         fm_alert("Alien, get out of here: %s.\n", kbuff);
     }
 
+    kfree(buff);
     return count;
 }
