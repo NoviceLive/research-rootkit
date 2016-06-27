@@ -63,6 +63,7 @@ Course 1: Modifying / Hooking the sys_call_table
     There is no hooking logic in ``getdents64``
     since I have not triggered it yet.
 
+
 Course 2: Implementing fundamental functionalities of rootkits
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -83,6 +84,21 @@ Course 2: Implementing fundamental functionalities of rootkits
 - Experiment 4: pshid
 
   Hiding processes by hiding entries under ``/proc``.
+
+- Experiment 5: pthid
+
+  Hiding ports by filtering contents
+  in ``/proc/net/tcp`` and the like
+  by hooking the ``show`` function of their ``seq_file`` interfaces.
+
+- Experiment 6: kohid
+
+  Hiding modules by hiding entries in ``/sys/module``
+  and filtering contents of ``/proc/modules``
+  by hooking its ``show`` function.
+
+  This experiment combines the techniques demonstrated
+  in ``Experiment 4: pshid`` and ``Experiment 5: pthid``.
 
 
 Projects Of Interests
