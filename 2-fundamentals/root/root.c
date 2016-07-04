@@ -75,7 +75,8 @@ write_handler(struct file * filp, const char __user *buff,
     char *kbuff;
     struct cred* cred;
 
-    kbuff = kmalloc(count, GFP_KERNEL);
+    // WARN: Be careful. There is a chance for off-by-one NULL.
+    kbuff = kmalloc(count + 1, GFP_KERNEL);
     if (!kbuff) {
         return -ENOMEM;
     }
