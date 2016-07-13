@@ -101,6 +101,41 @@ Course 2: Implementing fundamental functionalities of rootkits
   in ``Experiment 4: pshid`` and ``Experiment 5: pthid``.
 
 
+Course 3: Infecting critical kernel modules for persistence and more
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+- Experiment 1: Get started with ELF reading and writing.
+
+  Provding elementary materials on ELF parsing and modifying.
+
+  This experiment implemented an essential tool, i.e. ``setsym``,
+  for following experiments,
+  and also two trivil tools,
+  ``lssec`` resembling ``readelf -S``
+  and ``lssym`` resembling ``readelf -s`` / ``objdump -t``.
+
+- Experiment 2: noinj
+
+  Hijacking / Hooking the init and exit function of the module with
+  functions in the same module by modifying the symbol table.
+
+- Experiment 3: codeinj
+
+  Injecting the adapted ``fshid`` (See Experiment 3 of Course 2)
+  into a demonstrative simple module
+  (i.e. without ``static __init`` or ``static __exit``),
+  and hooking / hijacking its init and exit functions
+  by modifying the symbol table.
+
+- Experiment 3: real
+
+  Injecting the adapted ``fshid`` (See Experiment 3 of Course 2)
+  into a real-world kernel module
+  (i.e. with ``static __init`` or ``static __exit``)
+  by linking,
+  and hooking / hijacking its init and exit functions
+  by modifying the symbol table.
+
 Projects Of Interests
 ---------------------
 
@@ -121,7 +156,7 @@ References & Further Readings
 -----------------------------
 
 - `Suterusu Rootkit: Inline Kernel Function Hooking on x86 and ARM <https://poppopret.org/2013/01/07/suterusu-rootkit-inline-kernel-function-hooking-on-x86-and-arm/>`_
-
+- `Infecting loadable kernel modules: kernel versions 2.6.x/3.0.x <http://phrack.org/issues/68/11.html#article>`_
 
 .. _mncoppola/suterusu: https://github.com/mncoppola/suterusu
 .. _ivyl/rootkit: https://github.com/ivyl/rootkit
