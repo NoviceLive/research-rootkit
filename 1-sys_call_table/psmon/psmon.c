@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 MODULE_LICENSE("GPL");
 
-asmlinkage unsigned long **sys_call_table;
+asmlinkage unsigned long **real_sys_call_table;
 
 asmlinkage long
 fake_execve(const char __user *filename,
@@ -44,7 +44,7 @@ init_module(void)
   pr_alert("%s\n", "Greetings the World!");
 
   /* No consideration on failure. */
-  sys_call_table = get_sys_call_table();
+  real_sys_call_table = get_sys_call_table();
 
   disable_write_protection();
   HOOK_SYS_CALL_TABLE(execve);

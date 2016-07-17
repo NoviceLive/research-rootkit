@@ -32,12 +32,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # define HOOK_SYS_CALL_TABLE(name)                          \
     do {                                                    \
-        real_##name = (void *)sys_call_table[__NR_##name];  \
-        sys_call_table[__NR_##name] = (void *)fake_##name;  \
+        real_##name = (void *)real_sys_call_table[__NR_##name];  \
+        real_sys_call_table[__NR_##name] = (void *)fake_##name;  \
     } while (0)
 
 # define UNHOOK_SYS_CALL_TABLE(name)                    \
-    sys_call_table[__NR_##name] = (void *)real_##name
+    real_sys_call_table[__NR_##name] = (void *)real_##name
 
 
 # define set_file_op(op, path, new, old)                            \

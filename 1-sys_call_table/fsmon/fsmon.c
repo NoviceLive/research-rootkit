@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 MODULE_LICENSE("GPL");
 
-asmlinkage unsigned long **sys_call_table;
+asmlinkage unsigned long **real_sys_call_table;
 
 asmlinkage long
 fake_open(const char __user *filename, int flags, umode_t mode);
@@ -47,7 +47,7 @@ init_module(void)
   printk(KERN_ALERT "%s\n", "Greetings the World!");
 
   /* No consideration on failure. */
-  sys_call_table = get_sys_call_table();
+  real_sys_call_table = get_sys_call_table();
 
   disable_write_protection();
   HOOK_SYS_CALL_TABLE(open);

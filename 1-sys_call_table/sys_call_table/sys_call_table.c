@@ -19,35 +19,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # include <linux/module.h>
 # include <linux/kernel.h>
 
-# include "lib/lib.h"
+# include "lib.h"
 
 
 MODULE_LICENSE("GPL");
 
-asmlinkage unsigned long **sys_call_table;
+asmlinkage unsigned long **real_sys_call_table;
 
 
 int
 init_module(void)
 {
-  printk(KERN_ALERT "%s\n", "Greetings the World!");
+    printk(KERN_ALERT "%s\n", "Greetings the World!");
 
-  sys_call_table = get_sys_call_table();
+    real_sys_call_table = get_sys_call_table();
 
-  printk(KERN_ALERT "PAGE_OFFSET = %lx\n", PAGE_OFFSET);
-  printk(KERN_ALERT "sys_call_table = %p\n", sys_call_table);
-  printk(KERN_ALERT "sys_call_table - PAGE_OFFSET = %lu MiB\n",
-         ((unsigned long)sys_call_table -
-          (unsigned long)PAGE_OFFSET) / 1024 / 1024);
+    printk(KERN_ALERT "PAGE_OFFSET = %lx\n", PAGE_OFFSET);
+    printk(KERN_ALERT "sys_call_table = %p\n", real_sys_call_table);
+    printk(KERN_ALERT "sys_call_table - PAGE_OFFSET = %lu MiB\n",
+           ((unsigned long)real_sys_call_table -
+            (unsigned long)PAGE_OFFSET) / 1024 / 1024);
 
-  return 0;
+    return 0;
 }
 
 
 void
 cleanup_module(void)
 {
-  printk(KERN_ALERT "%s\n", "Farewell the World!");
+    printk(KERN_ALERT "%s\n", "Farewell the World!");
 
-  return;
+    return;
 }
