@@ -17,11 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # ifndef CPP
+// register_module_notifier, unregister_module_notifier.
 # include <linux/module.h>
 # include <linux/kernel.h>
 # include <linux/notifier.h> // struct notifier_block.
-// register_module_notifier, unregister_module_notifier.
-# include <linux/module.h>
 # endif // CPP
 
 # include "lib/lib.h"

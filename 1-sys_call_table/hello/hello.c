@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # include <linux/kernel.h>
 # endif // CPP
 
+# include "lib.h"
+
 
 MODULE_LICENSE("GPL");
 
@@ -27,7 +29,7 @@ MODULE_LICENSE("GPL");
 int
 init_module(void)
 {
-    pr_alert("%s\n", "Greetings the World!");
+    fm_alert("%s\n", "Greetings the World!");
 
     return 0;
 }
@@ -36,7 +38,7 @@ init_module(void)
 void
 cleanup_module(void)
 {
-    pr_alert("%s\n", "Farewell the World!");
+    fm_alert("%s\n", "Farewell the World!");
 
     return;
 }
