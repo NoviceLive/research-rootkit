@@ -143,9 +143,13 @@ Projects Of Interests
 
   An LKM rootkit targeting Linux 2.6/3.x on x86(_64), and ARM.
 
+- `maK-/maK_it-Linux-Rootkit`_
+
+   This is a linux rootkit using many of the techniques described on http://r00tkit.me.
+
 - `ivyl/rootkit`_
 
-  Sample Rootkit for Linux
+  Sample Rootkit for Linux.
 
 - `cloudsec/brootkit`_
 
@@ -159,5 +163,6 @@ References & Further Readings
 - `Infecting loadable kernel modules: kernel versions 2.6.x/3.0.x <http://phrack.org/issues/68/11.html#article>`_
 
 .. _mncoppola/suterusu: https://github.com/mncoppola/suterusu
+.. _maK-/maK_it-Linux-Rootkit: https://github.com/maK-/maK_it-Linux-Rootkit
 .. _ivyl/rootkit: https://github.com/ivyl/rootkit
 .. _cloudsec/brootkit: https://github.com/cloudsec/brootkit
