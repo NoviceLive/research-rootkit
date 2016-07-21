@@ -1,0 +1,49 @@
+$ uname --all
+Linux anon 4.6.4-1-ARCH #1 SMP PREEMPT Mon Jul 11 19:12:32 CEST 2016 x86_64 GNU/Linux
+
+$ grep --recursive NR_syscalls /lib/modules/4.6.4-1-ARCH/build/include
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#undef __NR_syscalls
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#define __NR_syscalls 288
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#undef __NR_syscalls
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#define __NR_syscalls (__NR3264_lstat+1)
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#undef __NR_syscalls
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#define __NR_syscalls (__NR_signalfd+1)
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#undef __NR_syscalls
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#define __NR_syscalls (__NR_mmap+1)
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#undef __NR_syscalls
+/lib/modules/4.6.4-1-ARCH/build/include/uapi/asm-generic/unistd.h:#define __NR_syscalls (__NR_fork+1)
+/lib/modules/4.6.4-1-ARCH/build/include/generated/asm-offsets.h:#define NR_syscalls 329 /* sizeof(syscalls_64)  # */
+/lib/modules/4.6.4-1-ARCH/build/include/generated/asm-offsets.h:#define IA32_NR_syscalls 380 /* sizeof(syscalls_ia32)   # */
+
+$ grep --recursive __NR_syscall_max /lib/modules/4.6.4-1-ARCH/build/include
+/lib/modules/4.6.4-1-ARCH/build/include/generated/asm-offsets.h:#define __NR_syscall_max 328 /* sizeof(syscalls_64) - 1 # */
+
+$ grep --recursive asm-offsets.h /lib/modules/4.6.4-1-ARCH/build/include
+/lib/modules/4.6.4-1-ARCH/build/include/asm-generic/asm-offsets.h:#include <generated/asm-offsets.h>
+
+
+
+$ uname --all
+Linux localhost.localdomain 3.10.0-327.22.2.el7.x86_64 #1 SMP Thu Jun 23 17:05:11 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+
+$ grep --recursive NR_syscalls /lib/modules/3.10.0-327.22.2.el7.x86_64/build/include
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/generated/asm-offsets.h:#define NR_syscalls 324 /* sizeof(syscalls_64)	# */
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/generated/asm-offsets.h:#define IA32_NR_syscalls 375 /* sizeof(syscalls_ia32)	# */
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#undef __NR_syscalls
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#define __NR_syscalls 274
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#undef __NR_syscalls
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#define __NR_syscalls (__NR3264_lstat+1)
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#undef __NR_syscalls
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#define __NR_syscalls (__NR_signalfd+1)
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#undef __NR_syscalls
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#define __NR_syscalls (__NR_mmap+1)
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#undef __NR_syscalls
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/uapi/asm-generic/unistd.h#define __NR_syscalls (__NR_fork+1)
+
+$ grep --recursive __NR_syscall_max /lib/modules/3.10.0-327.22.2.el7.x86_64/build/include
+/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/generated/asm-offsets.h:#define __NR_syscall_max 323 /* sizeof(syscalls_64) - 1	# */
+
+$ grep --recursive asm-offsets.h /lib/modules/3.10.0-327.22.2.el7.x86_64/build/include
+
+$ stat /lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/asm-generic/asm-offsest.h
+stat: cannot stat ‘/lib/modules/3.10.0-327.22.2.el7.x86_64/build/include/asm-generic/asm-offsest.h’: No such file or directory

@@ -128,7 +128,7 @@ print_module_list(void)
     }
 
     strlcpy(buff, THIS_MODULE->name, PAGE_SIZE);
-    for_each_module(mod) {
+    for_each_module (mod) {
         strlcat(buff, " ", PAGE_SIZE);
         strlcat(buff, mod->name, PAGE_SIZE);
     }
@@ -194,6 +194,71 @@ remove_dirent_entry(char *name,
 }
 
 
+void *
+get_lstar_sct_addr(void)
+{
+    u64 lstar;
+    u64 index;
+
+    rdmsrl(MSR_LSTAR, lstar);
+    for (index = 0; index <= PAGE_SIZE; index += 1) {
+        u8 *arr = (u8 *)lstar + index;
+
+        if (arr[0] == 0xff && arr[1] == 0x14 && arr[2] == 0xc5) {
+            return arr + 3;
+        }
+    }
+
+    return NULL;
+}
+
+
+unsigned long **
+get_lstar_sct(void)
+{
+    unsigned long *lstar_sct_addr = get_lstar_sct_addr();
+    if (lstar_sct_addr != NULL) {
+        u64 base = 0xffffffff00000000;
+        u32 code = *(u32 *)lstar_sct_addr;
+        return (void *)(base | code);
+    } else {
+        return NULL;
+    }
+}
+
+
+int
+set_lstar_sct(u32 address)
+{
+    unsigned long *lstar_sct_addr = get_lstar_sct_addr();
+    if (lstar_sct_addr != NULL) {
+        u8 *arr = (u8 *)lstar_sct_addr;
+        u8 *new = (u8 *)&address;
+
+        fm_alert("%02x %02x %02x %02x\n",
+                 arr[0], arr[1], arr[2], arr[3]);
+        fm_alert("%02x %02x %02x %02x\n",
+                 new[0], new[1], new[2], new[3]);
+
+        disable_wp();
+        memcpy(lstar_sct_addr, &address, sizeof address);
+        enable_wp();
+
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+
+// INFO: See also phys_to_virt.
+void *
+phys_to_virt_kern(phys_addr_t address)
+{
+    return (void *)(address - phys_base + __START_KERNEL_map);
+}
+
+
 // TODO: Can we provide these functionality to both user mode and
 // kernel land users in a single code base?
 char *
@@ -223,9 +288,10 @@ void
 print_memory(void *addr, size_t count, const char *prompt)
 {
     const size_t ONE_SIZE = 3;
+    const size_t SIZE = count * 4;
     char one[ONE_SIZE];
     size_t index;
-    char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    char *buff = kmalloc(SIZE, GFP_KERNEL);
 
     if (!buff) {
         fm_alert("%s\n", "kmalloc failed!");
@@ -233,23 +299,38 @@ print_memory(void *addr, size_t count, const char *prompt)
     }
 
     snprintf(one, ONE_SIZE, "%02x", *((unsigned char *)addr));
-    strlcpy(buff, one, PAGE_SIZE);
+    strlcpy(buff, one, SIZE);
 
     for (index = 1; index < count; index += 1) {
         if (index && index % 16 == 0) {
-            strlcat(buff, "\n", PAGE_SIZE);
+            strlcat(buff, "\n", SIZE);
         } else {
-            strlcat(buff, " ", PAGE_SIZE);
+            strlcat(buff, " ", SIZE);
         }
 
         snprintf(one, ONE_SIZE, "%02x",
                  *((unsigned char *)addr + index));
-        strlcat(buff, one, PAGE_SIZE);
+        strlcat(buff, one, SIZE);
     }
 
-    fm_alert("%s: %s\n", prompt, buff);
+    fm_alert("%s:\n%s\n", prompt, buff);
 
     kfree(buff);
+
+    return;
+}
+
+
+void
+print_ascii(void *addr, size_t count, const char *prompt)
+{
+    size_t index;
+
+    fm_alert("%s:\n", prompt);
+
+    for (index = 0; index < count; index += 1) {
+        pr_cont("%c", *((unsigned char *)addr + index));
+    }
 
     return;
 }
