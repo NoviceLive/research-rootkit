@@ -1,4 +1,9 @@
-obj-m := noinj.o
+TARGET = noinj
+obj-m := ${TARGET}ko.o
+${TARGET}ko-objs := ${TARGET}.o zeroevil/zeroevil.o
+
+
+
 
 
 default:

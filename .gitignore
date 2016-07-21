@@ -6,3 +6,6 @@
 Module.symvers
 modules.order
 *.ko
+lssec
+lssym
+setsym

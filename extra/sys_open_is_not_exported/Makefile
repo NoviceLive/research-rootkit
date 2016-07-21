@@ -1,4 +1,9 @@
-obj-m := symbols.o
+TARGET = symbols
+obj-m := ${TARGET}ko.o
+${TARGET}ko-objs := ${TARGET}.o zeroevil/zeroevil.o
+
+
+
 
 
 default:

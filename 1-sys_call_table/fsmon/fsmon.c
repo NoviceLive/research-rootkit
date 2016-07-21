@@ -47,16 +47,16 @@ asmlinkage long
 int
 init_module(void)
 {
-  printk(KERN_ALERT "%s\n", "Greetings the World!");
+  fm_alert("%s\n", "Greetings the World!");
 
   /* No consideration on failure. */
-  real_sys_call_table = get_sys_call_table();
+  real_sys_call_table = get_sct();
 
-  disable_write_protection();
+  disable_wp();
   HOOK_SYS_CALL_TABLE(open);
   HOOK_SYS_CALL_TABLE(unlink);
   HOOK_SYS_CALL_TABLE(unlinkat);
-  enable_write_protection();
+  enable_wp();
 
   return 0;
 }
@@ -65,13 +65,13 @@ init_module(void)
 void
 cleanup_module(void)
 {
-  disable_write_protection();
+  disable_wp();
   UNHOOK_SYS_CALL_TABLE(open);
   UNHOOK_SYS_CALL_TABLE(unlink);
   UNHOOK_SYS_CALL_TABLE(unlinkat);
-  enable_write_protection();
+  enable_wp();
 
-  printk(KERN_ALERT "%s\n", "Farewell the World!");
+  fm_alert("%s\n", "Farewell the World!");
 
   return;
 }
@@ -81,7 +81,7 @@ asmlinkage long
 fake_open(const char __user *filename, int flags, umode_t mode)
 {
   if ((flags & O_CREAT) && strcmp(filename, "/dev/null") != 0) {
-    printk(KERN_ALERT "open: %s\n", filename);
+    fm_alert("open: %s\n", filename);
   }
 
   return real_open(filename, flags, mode);
@@ -91,7 +91,7 @@ fake_open(const char __user *filename, int flags, umode_t mode)
 asmlinkage long
 fake_unlink(const char __user *pathname)
 {
-  printk(KERN_ALERT "unlink: %s\n", pathname);
+  fm_alert("unlink: %s\n", pathname);
 
   return real_unlink(pathname);
 }
@@ -100,7 +100,7 @@ fake_unlink(const char __user *pathname)
 asmlinkage long
 fake_unlinkat(int dfd, const char __user * pathname, int flag)
 {
-  printk(KERN_ALERT "unlinkat: %s\n", pathname);
+  fm_alert("unlinkat: %s\n", pathname);
 
   return real_unlinkat(dfd, pathname, flag);
 }

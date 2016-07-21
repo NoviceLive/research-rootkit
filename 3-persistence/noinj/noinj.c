@@ -24,6 +24,8 @@
 # include <linux/kernel.h>
 # endif // CPP
 
+# include "zeroevil/zeroevil.h"
+
 
 MODULE_LICENSE("GPL");
 
@@ -31,7 +33,7 @@ MODULE_LICENSE("GPL");
 int
 noinj_init(void)
 {
-    pr_alert("noinj: %s\n", "Greetings the World!");
+    fm_alert("noinj: %s\n", "Greetings the World!");
 
     return 0;
 }
@@ -40,7 +42,7 @@ noinj_init(void)
 void
 noinj_exit(void)
 {
-    pr_alert("noinj: %s\n", "Farewell the World!");
+    fm_alert("noinj: %s\n", "Farewell the World!");
 
     return;
 }
@@ -55,7 +57,7 @@ fake_init(void)
 {
     noinj_exit();
 
-    pr_alert("==> NOINJ: %s\n", "GR33TINGS THE W0RLD!");
+    fm_alert("==> NOINJ: %s\n", "GR33TINGS THE W0RLD!");
 
     return 0;
 }
@@ -66,7 +68,7 @@ fake_exit(void)
 {
     noinj_exit();
 
-    pr_alert("==> NOINJ: %s\n", "FAR3W311 THE W0RLD!");
+    fm_alert("==> NOINJ: %s\n", "FAR3W311 THE W0RLD!");
 
     return 0;
 }

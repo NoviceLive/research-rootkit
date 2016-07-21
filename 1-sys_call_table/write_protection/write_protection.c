@@ -33,18 +33,18 @@ init_module(void)
 {
   unsigned long cr0;
 
-  printk(KERN_ALERT "%s\n", "Greetings the World!");
+  fm_alert("%s\n", "Greetings the World!");
 
   cr0 = read_cr0();
-  printk(KERN_ALERT "Old: %d\n", test_bit(X86_CR0_WP_BIT, &cr0));
+  fm_alert("Old: %d\n", test_bit(X86_CR0_WP_BIT, &cr0));
 
-  disable_write_protection();
+  disable_wp();
   cr0 = read_cr0();
-  printk(KERN_ALERT "New: %d\n", test_bit(X86_CR0_WP_BIT, &cr0));
+  fm_alert("New: %d\n", test_bit(X86_CR0_WP_BIT, &cr0));
 
-  enable_write_protection();
+  enable_wp();
   cr0 = read_cr0();
-  printk(KERN_ALERT "Now: %d\n", test_bit(X86_CR0_WP_BIT, &cr0));
+  fm_alert("Now: %d\n", test_bit(X86_CR0_WP_BIT, &cr0));
 
   return 0;
 }
@@ -53,7 +53,7 @@ init_module(void)
 void
 cleanup_module(void)
 {
-  printk(KERN_ALERT "%s\n", "Farewell the World!");
+  fm_alert("%s\n", "Farewell the World!");
 
   return;
 }

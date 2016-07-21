@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
 
-grep sys_close /proc/kallsyms --color=always
-grep sys_open /proc/kallsyms --color=always
+grep -e '\bsys_open\b' -e '\bsys_read\b' \
+     -e '\bsys_write\b' -e '\bsys_close\b' \
+     /proc/kallsyms --color=always | less

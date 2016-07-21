@@ -44,14 +44,14 @@ asmlinkage long
 int
 init_module(void)
 {
-  pr_alert("%s\n", "Greetings the World!");
+  fm_alert("%s\n", "Greetings the World!");
 
   /* No consideration on failure. */
-  real_sys_call_table = get_sys_call_table();
+  real_sys_call_table = get_sct();
 
-  disable_write_protection();
+  disable_wp();
   HOOK_SYS_CALL_TABLE(execve);
-  enable_write_protection();
+  enable_wp();
 
   return 0;
 }
@@ -60,11 +60,11 @@ init_module(void)
 void
 cleanup_module(void)
 {
-  disable_write_protection();
+  disable_wp();
   UNHOOK_SYS_CALL_TABLE(execve);
-  enable_write_protection();
+  enable_wp();
 
-  pr_alert("%s\n", "Farewell the World!");
+  fm_alert("%s\n", "Farewell the World!");
 
   return;
 }
@@ -84,7 +84,7 @@ fake_execve(const char __user *filename,
     buff = NULL;
   }
 
-  pr_alert("execve: %s\n", args);
+  fm_alert("execve: %s\n", args);
 
   kfree(buff);
 

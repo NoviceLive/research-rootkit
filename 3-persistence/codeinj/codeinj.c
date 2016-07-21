@@ -24,6 +24,8 @@
 # include <linux/kernel.h>
 # endif // CPP
 
+# include "zeroevil/zeroevil.h"
+
 
 MODULE_LICENSE("GPL");
 
@@ -31,7 +33,7 @@ MODULE_LICENSE("GPL");
 int
 codeinj_init(void)
 {
-    pr_alert("codeinj: %s\n", "Greetings the World!");
+    fm_alert("codeinj: %s\n", "Greetings the World!");
 
     return 0;
 }
@@ -40,7 +42,7 @@ codeinj_init(void)
 void
 codeinj_exit(void)
 {
-    pr_alert("codeinj: %s\n", "Farewell the World!");
+    fm_alert("codeinj: %s\n", "Farewell the World!");
 
     return;
 }

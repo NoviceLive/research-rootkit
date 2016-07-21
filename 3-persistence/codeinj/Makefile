@@ -1,4 +1,9 @@
-obj-m := codeinj.o
+TARGET = codeinj
+obj-m := ${TARGET}ko.o
+${TARGET}ko-objs := ${TARGET}.o zeroevil/zeroevil.o
+
+
+
 
 
 default:

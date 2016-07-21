@@ -45,7 +45,7 @@ fake_seq_show(struct seq_file *seq, void *v);
 int
 init_module(void)
 {
-    pr_alert("%s\n", "Greetings the World!");
+    fm_alert("%s\n", "Greetings the World!");
 
     set_afinfo_seq_op(show, NET_ENTRY, SEQ_AFINFO_STRUCT,
                       fake_seq_show, real_seq_show);
@@ -63,7 +63,7 @@ cleanup_module(void)
                           real_seq_show, dummy);
     }
 
-    pr_alert("%s\n", "Farewell the World!");
+    fm_alert("%s\n", "Farewell the World!");
     return;
 }
 

@@ -33,15 +33,15 @@ asmlinkage unsigned long **real_sys_call_table;
 int
 init_module(void)
 {
-    printk(KERN_ALERT "%s\n", "Greetings the World!");
+    fm_alert("%s\n", "Greetings the World!");
 
-    real_sys_call_table = get_sys_call_table();
+    real_sys_call_table = get_sct();
 
-    printk(KERN_ALERT "PAGE_OFFSET = %lx\n", PAGE_OFFSET);
-    printk(KERN_ALERT "sys_call_table = %p\n", real_sys_call_table);
-    printk(KERN_ALERT "sys_call_table - PAGE_OFFSET = %lu MiB\n",
-           ((unsigned long)real_sys_call_table -
-            (unsigned long)PAGE_OFFSET) / 1024 / 1024);
+    fm_alert("PAGE_OFFSET = %lx\n", PAGE_OFFSET);
+    fm_alert("sys_call_table = %p\n", real_sys_call_table);
+    fm_alert("sys_call_table - PAGE_OFFSET = %lu MiB\n",
+             ((unsigned long)real_sys_call_table -
+              (unsigned long)PAGE_OFFSET) / 1024 / 1024);
 
     return 0;
 }
@@ -50,7 +50,7 @@ init_module(void)
 void
 cleanup_module(void)
 {
-    printk(KERN_ALERT "%s\n", "Farewell the World!");
+    fm_alert("%s\n", "Farewell the World!");
 
     return;
 }
