@@ -13,15 +13,15 @@ uninstall:
 
 
 lssec: lssec.c
-	${CC} lssec.c -o lssec
+	${CC} -std=c99 lssec.c -o lssec
 
 
 lssym: lssym.c uelf.c
-	${CC} lssym.c uelf.c -o lssym
+	${CC} -std=c99 lssym.c uelf.c -o lssym
 
 
 setsym: setsym.c uelf.c
-	${CC} setsym.c uelf.c -o setsym
+	${CC} -std=c99 setsym.c uelf.c -o setsym
 
 
 clean:

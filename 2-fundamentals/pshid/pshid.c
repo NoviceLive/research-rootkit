@@ -22,7 +22,8 @@
 # ifndef CPP
 # include <linux/module.h>
 # include <linux/kernel.h>
-# include <linux/fs.h> // filp_open, filp_close.
+// filp_open, filp_close, struct file, struct dir_context.
+# include <linux/fs.h>
 # endif // CPP
 
 # include "zeroevil/zeroevil.h"

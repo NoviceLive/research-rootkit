@@ -29,7 +29,7 @@
 
 MODULE_LICENSE("GPL");
 
-asmlinkage unsigned long **real_sys_call_table;
+asmlinkage unsigned long **sct;
 
 asmlinkage long
 fake_execve(const char __user *filename,
@@ -44,29 +44,29 @@ asmlinkage long
 int
 init_module(void)
 {
-  fm_alert("%s\n", "Greetings the World!");
+    fm_alert("%s\n", "Greetings the World!");
 
-  /* No consideration on failure. */
-  real_sys_call_table = get_sct();
+    /* No consideration on failure. */
+    sct = get_sct();
 
-  disable_wp();
-  HOOK_SYS_CALL_TABLE(execve);
-  enable_wp();
+    disable_wp();
+    HOOK_SCT(sct, execve);
+    enable_wp();
 
-  return 0;
+    return 0;
 }
 
 
 void
 cleanup_module(void)
 {
-  disable_wp();
-  UNHOOK_SYS_CALL_TABLE(execve);
-  enable_wp();
+    disable_wp();
+    UNHOOK_SCT(sct, execve);
+    enable_wp();
 
-  fm_alert("%s\n", "Farewell the World!");
+    fm_alert("%s\n", "Farewell the World!");
 
-  return;
+    return;
 }
 
 
@@ -75,18 +75,18 @@ fake_execve(const char __user *filename,
             const char __user *const __user *argv,
             const char __user *const __user *envp)
 {
-  char *args;
-  char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
-  if (buff) {
-    args = join_strings(argv, " ", buff, PAGE_SIZE);
-  } else {
-    args = (char *)argv[0];
-    buff = NULL;
-  }
+    char *args;
+    char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    if (buff) {
+        args = join_strings(argv, " ", buff, PAGE_SIZE);
+    } else {
+        args = (char *)argv[0];
+        buff = NULL;
+    }
 
-  fm_alert("execve: %s\n", args);
+    fm_alert("execve: %s\n", args);
 
-  kfree(buff);
+    kfree(buff);
 
-  return real_execve(filename, argv, envp);
+    return real_execve(filename, argv, envp);
 }

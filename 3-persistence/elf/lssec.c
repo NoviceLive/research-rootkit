@@ -22,6 +22,8 @@
 # include <stdlib.h>
 # include <stdio.h> // fopen, fprintf, printf.
 # include <string.h> // memcmp, perror.
+// Get PRIx64.
+# include <inttypes.h>
 
 # include <elf.h>
 
@@ -97,7 +99,7 @@ main(int argc, char **argv)
     for (unsigned num = 0; num < header.e_shnum; num += 1) {
         Elf64_Shdr section_header = section_header_table[num];
         char *name = string_table + section_header.sh_name;
-        printf("%4u %8llx %8llx %8llx %s\n",
+        printf("%4u %"PRIx64" %"PRIx64" %"PRIx64" %s\n",
                num, section_header.sh_offset,
                section_header.sh_size, section_header.sh_entsize,
                name);

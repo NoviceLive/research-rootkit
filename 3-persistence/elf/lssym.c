@@ -20,8 +20,12 @@
 
 
 # include <stdlib.h>
-# include <stdio.h> // fopen, fprintf, printf.
-# include <string.h> // perror.
+// fopen, fprintf, printf.
+# include <stdio.h>
+// perror.
+# include <string.h>
+// Get PRIx64, PRIu64.
+# include <inttypes.h>
 
 # include <elf.h>
 
@@ -101,7 +105,7 @@ main(int argc, char **argv)
            "num    index    size    value  info other  name");
     int total = symtab->sh_size / symtab->sh_entsize;
     for (int count = 0; count < total; count += 1) {
-        printf("%4llu %4llx %8llu %8llx %4x %4x %s\n",
+        printf("%2u %2x %"PRIu64" %"PRIx64" %4x %4x %s\n",
                count,
                syms[count].st_shndx,
                syms[count].st_size,
