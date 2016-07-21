@@ -1,7 +1,7 @@
 English `中文 <README-zh_CN.rst>`_
 
-the Research Rootkit project
-============================
+LibZeroEvil & the Research Rootkit project
+==========================================
 
 
 Notice
@@ -145,7 +145,7 @@ Projects Of Interests
 
 - `maK-/maK_it-Linux-Rootkit`_
 
-   This is a linux rootkit using many of the techniques described on http://r00tkit.me.
+  This is a linux rootkit using many of the techniques described on http://r00tkit.me.
 
 - `ivyl/rootkit`_
 

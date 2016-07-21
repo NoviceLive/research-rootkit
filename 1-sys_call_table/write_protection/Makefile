@@ -1,9 +1,9 @@
 TARGET = write_protection
 obj-m := ${TARGET}ko.o
-${TARGET}ko-objs := ${TARGET}.o lib/lib.o
+${TARGET}ko-objs := ${TARGET}.o zeroevil/zeroevil.o
 
 
-EXTRA_CFLAGS = "-I${PWD}/lib"
+
 
 
 default:

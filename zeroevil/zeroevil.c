@@ -1,44 +1,33 @@
-/*
-Copyright 2016 Gu Zhengxiong <rectigu@gmail.com>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// Copyright 2016 Gu Zhengxiong <rectigu@gmail.com>
+//
+// This file is part of LibZeroEvil.
+//
+// LibZeroEvil is free software:
+// you can redistribute it and/or modify it
+// under the terms of the GNU General Public License
+// as published by the Free Software Foundation,
+// either version 3 of the License,
+// or (at your option) any later version.
+//
+// LibZeroEvil is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with LibZeroEvil.
+// If not, see <http://www.gnu.org/licenses/>.
 
 
 # ifndef CPP
 # include <linux/kernel.h>
+// kmalloc, kfree.
 # include <linux/slab.h>
+// __NR_close.
 # include <linux/syscalls.h>
 # endif // CPP
 
 # include "structs.h"
-
-
-// TODO: Write other implementation.
-/* static unsigned long ** */
-/* get_sys_call_table_via_entry_SYSCALL_64(void) */
-/* { */
-/*   return NULL; */
-/* } */
-
-
-// TODO: Write other implementation.
-/* static unsigned long ** */
-/* get_sys_call_table_via_System_map(void) */
-/* { */
-/*   return NULL; */
-/* } */
 
 
 // WARN: This can be cheated.
@@ -57,14 +46,6 @@ get_sys_call_table_via_sys_close(void)
 }
 
 
-// TODO: Handle 32-bit cases.
-/* unsigned long ** */
-/* get_ia32_sys_call_table(void) */
-/* { */
-/*   return NULL; */
-/* } */
-
-
 unsigned long **
 get_sys_call_table(void)
 {
@@ -79,12 +60,11 @@ disable_write_protection(void)
     unsigned long cr0;
 
     preempt_disable();
-
     cr0 = read_cr0();
     clear_bit(X86_CR0_WP_BIT, &cr0);
     write_cr0(cr0);
-
     preempt_enable();
+
     return;
 }
 
@@ -96,12 +76,11 @@ enable_write_protection(void)
     unsigned long cr0;
 
     preempt_disable();
-
     cr0 = read_cr0();
     set_bit(X86_CR0_WP_BIT, &cr0);
     write_cr0(cr0);
-
     preempt_enable();
+
     return;
 }
 

@@ -19,54 +19,29 @@
 // If not, see <http://www.gnu.org/licenses/>.
 
 
-# ifndef CPP
-# include <linux/module.h>
-# include <linux/kernel.h>
-# endif // CPP
+# ifndef _GU_ZHENGXIONG_STRUCTS_H
+# define _GU_ZHENGXIONG_STRUCTS_H
 
 
-MODULE_LICENSE("GPL");
+// INFO: Copied from ``fs/readdir.h``.
+struct linux_dirent {
+    unsigned long   d_ino;
+    unsigned long   d_off;
+    unsigned short  d_reclen;
+    char            d_name[1];
+};
 
 
-int
-noinj_init(void)
-{
-    pr_alert("noinj: %s\n", "Greetings the World!");
-
-    return 0;
-}
+# define TEMPLATE "\x48\xa1\x88\x77\x66\x55\x44\x33\x22\x11\xff\xe0"
+# define HOOKED_SIZE (sizeof(TEMPLATE) - 1)
 
 
-void
-noinj_exit(void)
-{
-    pr_alert("noinj: %s\n", "Farewell the World!");
-
-    return;
-}
-
-
-module_init(noinj_init);
-module_exit(noinj_exit);
+struct hooked_item {
+    void *real_addr;
+    unsigned char real_opcode[HOOKED_SIZE];
+    unsigned char fake_opcode[HOOKED_SIZE];
+    struct list_head list;
+};
 
 
-int
-fake_init(void)
-{
-    noinj_exit();
-
-    pr_alert("==> NOINJ: %s\n", "GR33TINGS THE W0RLD!");
-
-    return 0;
-}
-
-
-int
-fake_exit(void)
-{
-    noinj_exit();
-
-    pr_alert("==> NOINJ: %s\n", "FAR3W311 THE W0RLD!");
-
-    return 0;
-}
+# endif // structs.h
