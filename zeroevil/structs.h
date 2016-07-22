@@ -32,16 +32,4 @@ struct linux_dirent {
 };
 
 
-# define TEMPLATE "\x48\xa1\x88\x77\x66\x55\x44\x33\x22\x11\xff\xe0"
-# define HOOKED_SIZE (sizeof(TEMPLATE) - 1)
-
-
-struct hooked_item {
-    void *real_addr;
-    unsigned char real_opcode[HOOKED_SIZE];
-    unsigned char fake_opcode[HOOKED_SIZE];
-    struct list_head list;
-};
-
-
 # endif // structs.h

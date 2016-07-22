@@ -3,32 +3,118 @@ English `中文 <README-zh_CN.rst>`_
 LibZeroEvil & the Research Rootkit project
 ==========================================
 
+This is ``LibZeroEvil & the Research Rootkit project``,
+in which there are step-by-step, experiment-based courses
+that help to get you started and keep your hands dirty
+with offensive or defensive development in the Linux kernel,
+and also guide you with demonstrative examples
+through the underlying core libray, ``LibZeroEvil``,
+which **attempts** to be
+a real-world consumable programming framework
+for any evil or good kernel-land crackers or protectors.
 
-Notice
-------
+Well, you know,
+it's just the beginning and ``LibZeroEvil`` is still in its infancy,
+serving educational purposes mainly.
+
+Warning
+-------
+
+It's never recommended to perform kernel module experiments
+on a physical machine, unless the owner will never complain about
+frequent rebooting or forced halting and possible data or work loss.
+
+You have been warned.
+
+Guidelines on Creating New Issues or Contributing
+-------------------------------------------------
+
+If a course doesn't compile,
+or do compile but doesn't work as expected,
+e.g. crashing or hanging your system,
+feel free to `create a new issue`_.
+But before that, consider the following.
+
+.. _create a new issue: https://github.com/NoviceLive/research-rootkit/issues
+
+1. Search existing issues to ensure that it won't be duplicated.
+
+2. Attach detailed information of your system, e.g., ``uname --all``,
+   and what your compiler throws on you,
+   i.e., the error information,
+   so that others can successfully reproduce your issue
+   and manage to help you out.
+
+   If you can't figure out which error is the most significant one,
+   paste all of them verbatim inside Markdown triple quotes.
+
+3. Remember that kernel compatibility issues
+   are the most common ones, since the author paid virtually no
+   attention to that. However,
+   it's my pleasure to learn about and fix them.
+
+4. Some courses are x64 only for the time being.
+
+Information on Kernel Compatibility
+-----------------------------------
+
+Tested Kernel
++++++++++++++
+
+My major development environment.
+
+- Kali
+
+  ``Linux anon 4.6.0-kali1-amd64 #1 SMP Debian 4.6.3-1kali1 (2016-07-12) x86_64 GNU/Linux``.
+
+Compilale Kernel
+++++++++++++++++
+
+That is, ``./test/makeall.sh --quiet`` reports no error,
+but I haven't tested the functionality.
+
+- Arch
+
+  ``Linux anon 4.6.4-1-ARCH #1 SMP PREEMPT Mon Jul 11 19:12:32 CEST 2016 x86_64 GNU/Linux``.
+
+- Ubuntu 14.04
+
+  ``Linux anon 4.2.0-42-generic #49~14.04.1-Ubuntu SMP Wed Jun 29 20:22:11 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux``
+
+Known Unresolved Compatibility Issues
++++++++++++++++++++++++++++++++++++++
+
+- ``struct dir_context`` doesn't exist on kerenl version 3.10 and earlier.
+
+  For example, CentOS 7,
+  ``Linux localhost.localdomain 3.10.0-327.22.2.el7.x86_64 #1 SMP Thu Jun 23 17:05:11 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux``.
+
+Notice on Directory Structure
+-----------------------------
 
 The directory structure of this repository might change drastically
 without any notifications.
 
-
 Available Courses
 -----------------
 
-Course 1: Modifying / Hooking the sys_call_table
-++++++++++++++++++++++++++++++++++++++++++++++++
+More courses might be designed and added here later.
 
-- Experiment 1: hello
+Course 1: Modifying / Hooking the ``sys_call_table``
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+- Experiment 1: ``hello``
 
   Hello World! kernel module.
 
-- Experiment 2: sys_call_table
+- Experiment 2: ``sys_call_table``
 
-  Get sys_call_table's address by brute-force memory searching
-  starting from PAGE_OFFSET.
+  Get ``sys_call_table`` 's address by brute-force memory searching
+  starting from ``PAGE_OFFSET``.
 
-- Experiment 3: write_protection
+- Experiment 3: ``write_protection``
 
-  Disable or enable Write Protection via CR0 register.
+  Disable or enable ``Write Protection`` via ``CR0`` register.
 
 - Roundup Experiment 1: fsmon
 
@@ -58,40 +144,34 @@ Course 1: Modifying / Hooking the sys_call_table
 
   Hidden files: ``032416_525.mp4``.
 
-  - **Notice**
-
-    There is no hooking logic in ``getdents64``
-    since I have not triggered it yet.
-
-
 Course 2: Implementing fundamental functionalities of rootkits
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-- Experiment 1: root
+- Experiment 1: ``root``
 
   Providing a root backdoor.
 
-- Experiment 2: komon
+- Experiment 2: ``komon``
 
   Preventing modules from initializing and functioning
   by substituting their init and exit functions
   when ``MODULE_STATE_COMING`` is notified to module notifiers.
 
-- Experiment 3: fshid
+- Experiment 3: ``fshid``
 
   Hiding files by hooking ``filldir``.
 
-- Experiment 4: pshid
+- Experiment 4: ``pshid``
 
   Hiding processes by hiding entries under ``/proc``.
 
-- Experiment 5: pthid
+- Experiment 5: ``pthid``
 
   Hiding ports by filtering contents
   in ``/proc/net/tcp`` and the like
   by hooking the ``show`` function of their ``seq_file`` interfaces.
 
-- Experiment 6: kohid
+- Experiment 6: ``kohid``
 
   Hiding modules by hiding entries in ``/sys/module``
   and filtering contents of ``/proc/modules``
@@ -100,11 +180,10 @@ Course 2: Implementing fundamental functionalities of rootkits
   This experiment combines the techniques demonstrated
   in ``Experiment 4: pshid`` and ``Experiment 5: pthid``.
 
-
 Course 3: Infecting critical kernel modules for persistence and more
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-- Experiment 1: Get started with ELF reading and writing.
+- Experiment 1: ``elf``
 
   Provding elementary materials on ELF parsing and modifying.
 
@@ -114,12 +193,15 @@ Course 3: Infecting critical kernel modules for persistence and more
   ``lssec`` resembling ``readelf -S``
   and ``lssym`` resembling ``readelf -s`` / ``objdump -t``.
 
-- Experiment 2: noinj
+  **They are coded for 64-bit ELF only,
+  but it shouldn't be difficult to adapt.**
+
+- Experiment 2: ``noinj``
 
   Hijacking / Hooking the init and exit function of the module with
   functions in the same module by modifying the symbol table.
 
-- Experiment 3: codeinj
+- Experiment 3: ``codeinj``
 
   Injecting the adapted ``fshid`` (See Experiment 3 of Course 2)
   into a demonstrative simple module
@@ -127,7 +209,7 @@ Course 3: Infecting critical kernel modules for persistence and more
   and hooking / hijacking its init and exit functions
   by modifying the symbol table.
 
-- Experiment 3: real
+- Roundup Experiment: ``real``
 
   Injecting the adapted ``fshid`` (See Experiment 3 of Course 2)
   into a real-world kernel module
@@ -135,6 +217,48 @@ Course 3: Infecting critical kernel modules for persistence and more
   by linking,
   and hooking / hijacking its init and exit functions
   by modifying the symbol table.
+
+Course 4: Modifying / Patching the ``entry_SYSCALL_64``
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**This is x64 only. However, it's not difficult to adapt.**
+
+- Experiment 1: get
+
+  Getting the ``sys_call_table`` 's address
+  in the machine code of ``entry_SYSCALL_64``
+  by searching the identifying bytes ``ff 14 c5``.
+
+- Experiment 2: set
+
+  Patching the ``sys_call_table`` 's address
+  in the machine code of ``entry_SYSCALL_64``
+  with a faked but innocuous, i.e. unmodified, one.
+
+- Experiment 3: rec
+
+  Recovering the ``sys_call_table`` 's address
+  in the machine code of ``entry_SYSCALL_64`` to that
+  obtained via ``sys_close`` -based memory searching.
+
+- Roundup Experiment: ifmon
+
+  Monitoring network flow (especially ``GET`` & ``POST``)
+  by hooking ``sys_sendto`` using the method demonstrated
+  in the above three experiments on ``entry_SYSCALL_64``.
+
+Course 5: Inline Hooking
+++++++++++++++++++++++++
+
+- Experiment 1: ``jmp``
+
+  Patching the starting bytes of target functions with
+  control flow redirection instructions,
+  e.g. ``PUSH RET``, ``JMP`` or ``INT``,
+  which transfer control to our function,
+  where our tasks are performed,
+  including restoring those bytes and
+  calling the victim function if necessary.
 
 Projects Of Interests
 ---------------------
@@ -154,7 +278,6 @@ Projects Of Interests
 - `cloudsec/brootkit`_
 
   Lightweight rootkit implemented by bash shell scripts v0.10.
-
 
 References & Further Readings
 -----------------------------

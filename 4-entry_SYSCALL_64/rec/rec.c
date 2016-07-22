@@ -19,29 +19,50 @@
 // If not, see <http://www.gnu.org/licenses/>.
 
 
+# ifndef CPP
 # include <linux/module.h>
 # include <linux/kernel.h>
+# endif // CPP
 
 # include "zeroevil/zeroevil.h"
 
 
 MODULE_LICENSE("GPL");
 
-unsigned long **real_sys_call_table;
-
 
 int
 init_module(void)
 {
+    unsigned long **real_sct;
+    unsigned long **lstar_sct;
+    phys_addr_t real_phys;
+    phys_addr_t lstar_phys;
+
     fm_alert("%s\n", "Greetings the World!");
 
-    real_sys_call_table = get_sct();
+    real_sct = get_sct_via_sys_close();
+    lstar_sct = get_lstar_sct();
 
-    fm_alert("PAGE_OFFSET = %lx\n", PAGE_OFFSET);
-    fm_alert("sys_call_table = %p\n", real_sys_call_table);
-    fm_alert("sys_call_table - PAGE_OFFSET = %lu MiB\n",
-             ((unsigned long)real_sys_call_table -
-              (unsigned long)PAGE_OFFSET) / 1024 / 1024);
+    if (real_sct == NULL || lstar_sct == NULL) {
+        return 1;
+    }
+
+    fm_alert("%s\n", "==> According to sys_close:");
+    fm_alert("virt: %p\n", real_sct);
+    real_phys = virt_to_phys(real_sct);
+    fm_alert("phys: %llx\n", real_phys);
+
+    fm_alert("%s\n", "==> According to entry_SYSCALL_64:");
+    fm_alert("virt: %p\n", lstar_sct);
+    lstar_phys = virt_to_phys(lstar_sct);
+    fm_alert("phys: %llx\n", lstar_phys);
+
+    if (real_phys == lstar_phys) {
+        fm_alert("%s\n", "==> Matched.");
+    } else {
+        fm_alert("%s\n", "==> Patching to that from sys_close...");
+        set_lstar_sct((u32)(unsigned long)phys_to_virt_kern(real_phys));
+    }
 
     return 0;
 }

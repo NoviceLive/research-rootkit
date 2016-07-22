@@ -28,7 +28,7 @@
 
 MODULE_LICENSE("GPL");
 
-asmlinkage unsigned long **sct;
+unsigned long **sct;
 
 asmlinkage long
 fake_open(const char __user *filename, int flags, umode_t mode);

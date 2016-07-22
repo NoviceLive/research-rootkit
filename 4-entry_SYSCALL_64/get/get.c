@@ -19,29 +19,40 @@
 // If not, see <http://www.gnu.org/licenses/>.
 
 
+# ifndef CPP
 # include <linux/module.h>
 # include <linux/kernel.h>
+# endif // CPP
 
 # include "zeroevil/zeroevil.h"
 
 
 MODULE_LICENSE("GPL");
 
-unsigned long **real_sys_call_table;
-
 
 int
 init_module(void)
 {
+    unsigned long **sct1;
+    unsigned long **sct2;
+
     fm_alert("%s\n", "Greetings the World!");
 
-    real_sys_call_table = get_sct();
+    sct1 = get_sct_via_sys_close();
+    sct2 = get_lstar_sct();
 
-    fm_alert("PAGE_OFFSET = %lx\n", PAGE_OFFSET);
-    fm_alert("sys_call_table = %p\n", real_sys_call_table);
-    fm_alert("sys_call_table - PAGE_OFFSET = %lu MiB\n",
-             ((unsigned long)real_sys_call_table -
-              (unsigned long)PAGE_OFFSET) / 1024 / 1024);
+    if (sct1 == NULL || sct2 == NULL) {
+        return 1;
+    }
+
+    fm_alert("%s\n", "==> According to sys_close:");
+    fm_alert("virt: %p\n", sct1);
+    fm_alert("phys: %llx\n", virt_to_phys(sct1));
+    fm_alert("%s\n", "==> According to entry_SYSCALL_64:");
+    fm_alert("virt: %p\n", sct2);
+    fm_alert("phys: %llx\n", virt_to_phys(sct2));
+
+    fm_alert("%s\n", "==> Do they match?");
 
     return 0;
 }

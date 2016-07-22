@@ -29,7 +29,7 @@
 
 MODULE_LICENSE("GPL");
 
-asmlinkage unsigned long **sct;
+unsigned long **sct;
 
 asmlinkage long
 fake_execve(const char __user *filename,

