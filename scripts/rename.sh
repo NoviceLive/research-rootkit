@@ -10,6 +10,6 @@ SED='sed --in-place'
 # done
 
 
-find -name '*.c' -or -name '*.h' | while read -r _source; do
-    ${SED} 's/get_sys_call_table/get_sct/g' "${_source}"
-done
+# find -name '*.c' -or -name '*.h' | while read -r _source; do
+#     ${SED} 's/get_sys_call_table/get_sct/g' "${_source}"
+# done

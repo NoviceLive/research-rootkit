@@ -8,13 +8,13 @@ in which there are step-by-step, experiment-based courses
 that help to get you started and keep your hands dirty
 with offensive or defensive development in the Linux kernel,
 and also guide you with demonstrative examples
-through the underlying core libray, ``LibZeroEvil``,
+through the underlying core library, ``LibZeroEvil``,
 which **attempts** to be
 a real-world consumable programming framework
-for any evil or good kernel-land crackers or protectors.
+for any evil or good kernel-land invaders or defenders.
 
-Well, you know,
-it's just the beginning and ``LibZeroEvil`` is still in its infancy,
+That being said, it's just the beginning
+and ``LibZeroEvil`` is still in its infancy,
 serving educational purposes mainly.
 
 Warning
@@ -67,8 +67,8 @@ My major development environment.
 
   ``Linux anon 4.6.0-kali1-amd64 #1 SMP Debian 4.6.3-1kali1 (2016-07-12) x86_64 GNU/Linux``.
 
-Compilale Kernel
-++++++++++++++++
+Compilable Kernel
++++++++++++++++++
 
 That is, ``./test/makeall.sh --quiet`` reports no error,
 but I haven't tested the functionality.
@@ -84,7 +84,7 @@ but I haven't tested the functionality.
 Known Unresolved Compatibility Issues
 +++++++++++++++++++++++++++++++++++++
 
-- ``struct dir_context`` doesn't exist on kerenl version 3.10 and earlier.
+- ``struct dir_context`` doesn't exist on kernel version 3.10 and earlier.
 
   For example, CentOS 7,
   ``Linux localhost.localdomain 3.10.0-327.22.2.el7.x86_64 #1 SMP Thu Jun 23 17:05:11 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux``.
@@ -114,7 +114,7 @@ Course 1: Modifying / Hooking the ``sys_call_table``
 
 - Experiment 3: ``write_protection``
 
-  Disable or enable ``Write Protection`` via ``CR0`` register.
+  Disable or enable ``Write Protection`` via the ``CR0`` register.
 
 - Roundup Experiment 1: fsmon
 
@@ -185,11 +185,11 @@ Course 3: Infecting critical kernel modules for persistence and more
 
 - Experiment 1: ``elf``
 
-  Provding elementary materials on ELF parsing and modifying.
+  Providing elementary materials on ELF parsing and modifying.
 
   This experiment implemented an essential tool, i.e. ``setsym``,
   for following experiments,
-  and also two trivil tools,
+  and also two trivial tools,
   ``lssec`` resembling ``readelf -S``
   and ``lssym`` resembling ``readelf -s`` / ``objdump -t``.
 
@@ -258,7 +258,7 @@ Course 5: Inline Hooking
   which transfer control to our function,
   where our tasks are performed,
   including restoring those bytes and
-  calling the victim function if necessary.
+  invoking the victim function if necessary.
 
 Projects Of Interests
 ---------------------
