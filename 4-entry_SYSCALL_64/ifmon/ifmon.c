@@ -41,7 +41,7 @@ MODULE_LICENSE("GPL");
 
 phys_addr_t real_phys;
 
-unsigned long *fake_sct[__NR_syscall_max] = { 0 };
+unsigned long *fake_sct[__NR_syscall_max + 1] = { 0 };
 
 asmlinkage long
 fake_sendto(int fd, void __user *buff, size_t len, unsigned flags,

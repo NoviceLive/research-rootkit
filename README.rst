@@ -70,7 +70,7 @@ My major development environment.
 Compilable Kernel
 +++++++++++++++++
 
-That is, ``./test/makeall.sh --quiet`` reports no error,
+That is, ``./tests/makeall.sh --quiet`` reports no error,
 but I haven't tested the functionality.
 
 - Arch

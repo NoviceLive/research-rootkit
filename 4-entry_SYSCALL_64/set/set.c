@@ -51,7 +51,7 @@ struct file_operations proc_fops = {
 // module mapping space
 // ffffffffa0000000 - ffffffffff5fffff (=1526 MB)
 
-u64 fake_sct[__NR_syscall_max] = { 0 };
+u64 fake_sct[__NR_syscall_max + 1] = { 0 };
 
 
 int
