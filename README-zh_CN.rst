@@ -1,10 +1,16 @@
 `English <README.rst>`_ 中文
 
+
 Linux Rootkit 研究
 ==================
 
+
+- `Linux Rootkit 系列六：基于修改派遣例程的系统调用挂钩`_
+
+
 FreeBuf 链接
 =============
+
 
 NoviceLive_
 ------------
@@ -13,6 +19,7 @@ NoviceLive_
 - `Linux Rootkit系列三：实例详解 Rootkit 必备的基本功能`_
 - `Linux Rootkit 系列五：感染系统关键内核模块实现持久化`_
 
+
 Arciryas_
 ---------
 
@@ -20,6 +27,7 @@ Arciryas_
 - `Linux Rootkit 系列四：对于系统调用挂钩方法的补充`_
 
 
+.. _Linux Rootkit 系列六：基于修改派遣例程的系统调用挂钩: https://github.com/LibreCrops/documentation-zh_CN/blob/master/source/linux_rootkit/entry_SYSCALL_64.rst
 .. _Linux Rootkit 系列二：基于修改 sys_call_table 的系统调用挂钩: http://www.freebuf.com/sectool/105713.html
 .. _Linux Rootkit系列三：实例详解 Rootkit 必备的基本功能: http://www.freebuf.com/articles/system/107829.html
 .. _Linux Rootkit 系列五：感染系统关键内核模块实现持久化: http://www.freebuf.com/articles/system/109034.html
