@@ -55,7 +55,7 @@ module_exit(noinj_exit);
 int
 fake_init(void)
 {
-    noinj_exit();
+    noinj_init();
 
     fm_alert("==> NOINJ: %s\n", "GR33TINGS THE W0RLD!");
 

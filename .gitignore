@@ -9,3 +9,6 @@ modules.order
 lssec
 lssym
 setsym
+
+
+githooks/pre-commit
