@@ -30,7 +30,7 @@ Guidelines on Creating New Issues or Contributing
 -------------------------------------------------
 
 If a course doesn't compile,
-or do compile but doesn't work as expected,
+or compiles but doesn't work as expected,
 e.g. crashing or hanging your system,
 feel free to `create a new issue`_.
 But before that, consider the following.
