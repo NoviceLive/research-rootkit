@@ -82,6 +82,8 @@ get_sct(void)
 #endif
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 7, 0)
+    // Last exported: https://elixir.bootlin.com/linux/v5.6.19/source/kernel/kallsyms.c
+    // Not exported:  https://elixir.bootlin.com/linux/v5.7-rc1/source/kernel/kallsyms.c
     if (!sct) {
         fm_info("Trying to get sct via kallsyms_lookup_name....");
         sct = (unsigned long **)kallsyms_lookup_name("sys_call_table");
@@ -94,9 +96,12 @@ get_sct(void)
         sct = get_sct_via_sys_close();
     }
 #endif
-    if (!sct) {
+    if (sct) {
+        fm_info("Got sct: %lx", (unsigned long)sct);
+    } else {
         fm_alert("BUG: Failed to get sct!!! Please report.");
     }
+
     return sct;
 }
 
