@@ -27,11 +27,13 @@
 # include <linux/syscalls.h>
 // struct linux_dirent64.
 # include <linux/dirent.h>
+# include <linux/version.h>
 # endif // CPP
 
 # include "zeroevil.h"
 
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
 // WARN: This can be cheated if someone places a faked
 // but unmodified sys_call_table before the real one.
 unsigned long **
@@ -47,12 +49,16 @@ get_sct_via_sys_close(void)
 
     return NULL;
 }
+#endif
 
 
 unsigned long **
 get_sct(void)
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
     return get_sct_via_sys_close();
+#endif
+    return NULL;
 }
 
 
