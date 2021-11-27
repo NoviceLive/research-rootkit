@@ -35,9 +35,13 @@
 # include <linux/printk.h>
 // struct linux_dirent64.
 # include <linux/dirent.h>
+# include <linux/version.h>
 # endif // CPP
 
 # include "structs.h"
+
+
+#define MKVAR(Type, Name, From) Type Name = (Type)(From);
 
 
 // Functions related to the system call table or dispatcher.

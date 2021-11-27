@@ -32,13 +32,25 @@ MODULE_LICENSE("GPL");
 unsigned long **sct;
 
 asmlinkage long
-fake_execve(const char __user *filename,
+fake_execve(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+            const char __user *filename,
             const char __user *const __user *argv,
-            const char __user *const __user *envp);
+            const char __user *const __user *envp
+#else
+            struct pt_regs *regs
+#endif
+            );
 asmlinkage long
-(*real_execve)(const char __user *filename,
+(*real_execve)(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+               const char __user *filename,
                const char __user *const __user *argv,
-               const char __user *const __user *envp);
+               const char __user *const __user *envp
+#else
+            struct pt_regs *regs
+#endif
+               );
 
 
 int
@@ -71,15 +83,30 @@ cleanup_module(void)
 
 
 asmlinkage long
-fake_execve(const char __user *filename,
+fake_execve(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+            const char __user *filename,
             const char __user *const __user *argv,
-            const char __user *const __user *envp)
+            const char __user *const __user *envp
+#else
+            struct pt_regs *regs
+#endif
+            )
 {
+    long ret = 0;
     char *args;
-    char *buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
+    char *buff;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
+    /* MKVAR(const char __user *, filename, regs->di); */
+    MKVAR(const char __user *const __user *, argv, regs->si);
+    /* MKVAR(const char __user *const __user *, envp, regs->dx); */
+#endif
+
+    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
     if (buff) {
         args = join_strings(argv, " ", buff, PAGE_SIZE);
     } else {
+        fm_alert("kmalloc failed!!!");
         args = (char *)argv[0];
         buff = NULL;
     }
@@ -88,5 +115,13 @@ fake_execve(const char __user *filename,
 
     kfree(buff);
 
-    return real_execve(filename, argv, envp);
+    ret = real_execve(
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
+                      regs
+#else
+                      filename, argv, envp
+#endif
+                      );
+
+    return ret;
 }
