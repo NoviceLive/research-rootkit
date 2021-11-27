@@ -219,7 +219,7 @@ print_dents(struct linux_dirent *dirp, long total)
         cur = (struct linux_dirent *)((unsigned long)dirp + index);
     }
 
-    fm_alert("%s\n", buff);
+    fm_info("%s\n", buff);
     kfree(buff);
 
     return;
@@ -250,7 +250,7 @@ print_dents64(struct linux_dirent64 *dirp, long total)
         cur = (struct linux_dirent64 *)((unsigned long)dirp + index);
     }
 
-    fm_alert("%s\n", buff);
+    fm_info("%s\n", buff);
     kfree(buff);
 
     return;

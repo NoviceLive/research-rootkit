@@ -186,6 +186,7 @@ print_ascii(void *addr, size_t count, const char *prompt);
 # define HOOK_SCT(sct, name)                    \
     do {                                        \
         real_##name = (void *)sct[__NR_##name]; \
+        fm_info("Original real_" #name " = %lx", (unsigned long)real_##name);    \
         sct[__NR_##name] = (void *)fake_##name; \
     } while (0)
 
