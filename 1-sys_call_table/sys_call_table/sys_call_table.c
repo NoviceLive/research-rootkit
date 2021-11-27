@@ -38,7 +38,7 @@ init_module(void)
     real_sys_call_table = get_sct();
 
     fm_alert("PAGE_OFFSET = %lx\n", PAGE_OFFSET);
-    fm_alert("sys_call_table = %p\n", real_sys_call_table);
+    fm_alert("sys_call_table = %lx\n", (unsigned long)real_sys_call_table);
     fm_alert("sys_call_table - PAGE_OFFSET = %lu MiB\n",
              ((unsigned long)real_sys_call_table -
               (unsigned long)PAGE_OFFSET) / 1024 / 1024);

