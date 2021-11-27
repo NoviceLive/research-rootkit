@@ -33,6 +33,9 @@
 # include "zeroevil.h"
 
 
+unsigned long __force_order;
+
+
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
 // WARN: This can be cheated if someone places a faked
 // but unmodified sys_call_table before the real one.
@@ -71,7 +74,7 @@ disable_wp(void)
     preempt_disable();
     cr0 = read_cr0();
     clear_bit(X86_CR0_WP_BIT, &cr0);
-    write_cr0(cr0);
+    old_native_write_cr0(cr0);
     preempt_enable();
 
     return;

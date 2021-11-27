@@ -104,6 +104,14 @@ disable_wp(void);
 void
 enable_wp(void);
 
+extern unsigned long __force_order;
+
+// Use an old version of write_cr0 to workaround cr_pinning in newer kernels.
+static inline void old_native_write_cr0(unsigned long val)
+{
+    asm volatile("mov %0,%%cr0": : "r" (val), "m" (__force_order));
+}
+
 
 // Helper functions that print some information.
 
