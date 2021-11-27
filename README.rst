@@ -275,10 +275,6 @@ Projects Of Interests
 
   Sample Rootkit for Linux.
 
-- `cloudsec/brootkit`_
-
-  Lightweight rootkit implemented by bash shell scripts v0.10.
-
 References & Further Readings
 -----------------------------
 
@@ -288,4 +284,3 @@ References & Further Readings
 .. _mncoppola/suterusu: https://github.com/mncoppola/suterusu
 .. _maK-/maK_it-Linux-Rootkit: https://github.com/maK-/maK_it-Linux-Rootkit
 .. _ivyl/rootkit: https://github.com/ivyl/rootkit
-.. _cloudsec/brootkit: https://github.com/cloudsec/brootkit
