@@ -172,6 +172,12 @@ print_ascii(void *addr, size_t count, const char *prompt);
 # define fm_alert(fmt, ...) \
     fm_printk(KERN_ALERT, fmt, ##__VA_ARGS__)
 
+# define fn_info(fmt, ...) \
+    fn_printk(KERN_INFO, fmt, ##__VA_ARGS__)
+
+# define fm_info(fmt, ...) \
+    fm_printk(KERN_INFO, fmt, ##__VA_ARGS__)
+
 
 // Hooking helpers for sys_call_table .
 
