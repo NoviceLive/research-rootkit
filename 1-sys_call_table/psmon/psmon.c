@@ -94,7 +94,6 @@ fake_execve(
             )
 {
     long ret = 0;
-    char *args;
     char *buff;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
     /* MKVAR(const char __user *, filename, regs->di); */
@@ -104,16 +103,13 @@ fake_execve(
 
     buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
     if (buff) {
-        args = join_strings(argv, " ", buff, PAGE_SIZE);
+        fm_alert("execve: %s\n", join_strings_from_user(argv, " ", buff, PAGE_SIZE));
+        kfree(buff);
     } else {
+        char tmp[1024];
         fm_alert("kmalloc failed!!!");
-        args = (char *)argv[0];
-        buff = NULL;
+        fm_alert("execve: %s\n", join_strings_from_user(argv, " ", tmp, sizeof tmp));
     }
-
-    fm_alert("execve: %s\n", args);
-
-    kfree(buff);
 
     ret = real_execve(
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)

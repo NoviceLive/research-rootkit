@@ -20,4 +20,4 @@ clean:
 
 test: default
 	sudo dmesg -c && sudo insmod ${TARGET}ko.ko && sudo dmesg -c \
-		&& whoami; uname -a &&  sudo dmesg -c && sudo rmmod ${TARGET}ko && sudo dmesg -c
+		&& whoami; uname -a; rm -f 1234abcnosuchthing; sudo dmesg -c && sudo rmmod ${TARGET}ko && sudo dmesg -c
