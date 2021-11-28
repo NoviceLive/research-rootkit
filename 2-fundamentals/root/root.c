@@ -22,7 +22,10 @@
 # ifndef CPP
 # include <linux/module.h>
 # include <linux/kernel.h>
+# include <linux/version.h>
+# if LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0)
 # include <linux/fs.h> // struct file_operations.
+# endif
 # include <linux/proc_fs.h> // proc_create, proc_remove.
 # include <linux/slab.h> // kmalloc, kfree.
 # include <asm/uaccess.h> // copy_from_user.
@@ -46,8 +49,19 @@ ssize_t
 write_handler(struct file * filp, const char __user *buff,
               size_t count, loff_t *offp);
 
-struct file_operations proc_fops = {
-    .write = write_handler
+struct
+# if LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0)
+file_operations
+# else
+proc_ops
+# endif
+proc_fops = {
+# if LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0)
+    .write
+# else
+    .proc_write
+# endif
+    = write_handler
 };
 
 
