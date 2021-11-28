@@ -100,8 +100,13 @@ fake_open(
     MKVAR(int, flags, regs->si);
     /* MKVAR(umode_t, mode, regs->dx); */
 #endif
-    if ((flags & O_CREAT) && strcmp(filename, "/dev/null") != 0) {
-        fm_alert("open: %s\n", filename);
+    char kfn[1024];
+    if (strncpy_from_user(kfn, filename, sizeof kfn) <= 0) {
+        fm_alert("strncpy_from_user failed!!!");
+    } else {
+        if ((flags & O_CREAT) && strcmp(kfn, "/dev/null") != 0) {
+            fm_alert("open: %s\n", kfn);
+        }
     }
 
     return real_open(
@@ -128,8 +133,13 @@ fake_openat(
     MKVAR(const char __user *, filename, regs->si);
     MKVAR(int, flags, regs->dx);
 #endif
-    if ((flags & O_CREAT) && strcmp(filename, "/dev/null") != 0) {
-        fm_alert("openat: %s\n", filename);
+    char kfn[1024];
+    if (strncpy_from_user(kfn, filename, sizeof kfn) <= 0) {
+        fm_alert("strncpy_from_user failed!!!");
+    } else {
+        if ((flags & O_CREAT) && strcmp(kfn, "/dev/null") != 0) {
+            fm_alert("openat: %s\n", kfn);
+        }
     }
 
     return real_openat(
@@ -154,7 +164,12 @@ fake_unlink(
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
     MKVAR(const char __user *, pathname, regs->di);
 #endif
-    fm_alert("unlink: %s\n", pathname);
+    char kfn[1024];
+    if (strncpy_from_user(kfn, pathname, sizeof kfn) <= 0) {
+        fm_alert("strncpy_from_user failed!!!");
+    } else {
+        fm_alert("unlink: %s\n", kfn);
+    }
 
     return real_unlink(
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
@@ -180,7 +195,12 @@ fake_unlinkat(
     MKVAR(const char __user *, pathname, regs->si);
     /* MKVAR(int, flag, regs->dx); */
 #endif
-    fm_alert("unlinkat: %s\n", pathname);
+    char kfn[1024];
+    if (strncpy_from_user(kfn, pathname, sizeof kfn) <= 0) {
+        fm_alert("strncpy_from_user failed!!!");
+    } else {
+        fm_alert("unlinkat: %s\n", kfn);
+    }
 
     return real_unlinkat(
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0)
