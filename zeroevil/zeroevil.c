@@ -490,8 +490,34 @@ remove_inline_hook(void *real_addr)
 }
 
 
-// TODO: Can we provide these functionality to both user mode and
-// kernel land users in a single code base?
+char *join_strings_from_user(const char __user *const __user *ups, const char *delim, char *buff, size_t bufcap)
+{
+    int index;
+    const char __user* up;
+    char tmp[1024];
+
+    if (copy_from_user(&up, ups, sizeof up))
+        return NULL;
+    if (strncpy_from_user(buff, up, bufcap) <= 0)
+        return NULL;
+
+    index = 1;
+    if (copy_from_user(&up, ups + index, sizeof up))
+        return NULL;
+    while (up) {
+        strlcat(buff, delim, bufcap);
+        if (strncpy_from_user(tmp, up, sizeof tmp) <= 0)
+            return NULL;
+        strlcat(buff, tmp, bufcap);
+        index += 1;
+        if (copy_from_user(&up, ups + index, sizeof up))
+            return NULL;
+    }
+
+    return buff;
+}
+
+
 char *
 join_strings(const char *const *strings, const char *delim,
              char *buff, size_t count)

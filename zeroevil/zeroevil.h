@@ -144,6 +144,8 @@ remove_dent64(char *name, struct linux_dirent64 *dirp, long total);
 // Miscellaneous helper functions.
 
 // TODO: Consider the name ``strjoin`` or ``join_str``?
+char * join_strings_from_user(const char *const *strings, const char *delim, char *buff, size_t count);
+
 char *
 join_strings(const char *const *strings, const char *delim,
              char *buff, size_t count);
