@@ -32,6 +32,7 @@ int
 init_module(void)
 {
   unsigned long cr0;
+  unsigned long cr4;
 
   fm_alert("%s\n", "Greetings the World!");
 
@@ -45,6 +46,9 @@ init_module(void)
   enable_wp();
   cr0 = read_cr0();
   fm_alert("Now: %d\n", test_bit(X86_CR0_WP_BIT, &cr0));
+
+  cr4 = __read_cr4();
+  fm_alert("old cr4 = %lx", cr4);
 
   return 0;
 }
