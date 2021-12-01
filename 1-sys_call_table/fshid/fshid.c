@@ -127,8 +127,6 @@ fake_getdents(
     /* unsigned int count = regs->dx; */
 #endif
 
-    fm_info("Entered %s", __func__);
-
     ret = real_getdents(
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
                         regs
@@ -163,8 +161,6 @@ fake_getdents64(
     struct linux_dirent64 __user *dirent = (struct linux_dirent64 __user *)regs->si;
     /* unsigned int count = regs->dx; */
 #endif
-
-    fm_info("Entered %s", __func__);
 
     ret = real_getdents64(
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)

